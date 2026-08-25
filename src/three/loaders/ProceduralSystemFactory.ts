@@ -225,6 +225,12 @@ export function createProceduralFullBody(): THREE.Group {
     ["BodyLayer_Digestive", "SYS_DIGESTIVE", "#bd8062", [0, -0.42, 0.12], [0.75, 0.65, 0.48]],
     ["BodyLayer_Urinary", "SYS_URINARY", "#8d77ba", [0, -0.65, -0.12], [0.58, 0.36, 0.34]],
     ["BodyLayer_Nervous", "SYS_NERVOUS", "#d0ad7e", [0, 1.72, 0], [0.55, 0.55, 0.55]],
+    ["BodyLayer_Skeletal", "SYS_SKELETAL", "#d8c9ae", [0, 0, -0.18], [0.62, 1.38, 0.3]],
+    ["BodyLayer_Muscular", "SYS_MUSCULAR", "#c87369", [0, 0, 0.02], [0.78, 1.46, 0.46]],
+    ["BodyLayer_Endocrine", "SYS_ENDOCRINE", "#d29aba", [0, 0.35, 0.32], [0.18, 0.88, 0.16]],
+    ["BodyLayer_Lymphatic", "SYS_LYMPHATIC", "#83b892", [0, 0.12, 0.18], [0.45, 1.18, 0.24]],
+    ["BodyLayer_Reproductive", "SYS_REPRODUCTIVE", "#c88eac", [0, -1.0, 0.28], [0.32, 0.28, 0.28]],
+    ["BodyLayer_Integumentary", "SYS_INTEGUMENTARY", "#d39b78", [0, 0, 0], [0.92, 1.58, 0.56]],
   ] as const;
   for (const [name, systemId, color, position, scale] of layers) {
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.65, 28, 22), material(color, 0.82));
