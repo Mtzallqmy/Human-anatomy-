@@ -15,6 +15,7 @@ import {
 import { modelAssets } from "@/src/data/assets/modelAssets";
 import { comprehensiveDiseases } from "@/src/data/pathology/comprehensiveDiseases";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
+import { wholeBodyPhysiologyAnimations } from "@/src/data/physiology/wholeBodyProcesses";
 import { scientificReferences } from "@/src/data/references/references";
 import { bodySystems } from "@/src/data/systems/systems";
 import type { SearchResult } from "@/src/types/medical";
@@ -29,6 +30,7 @@ const physiologyCatalog = [
   ...physiologyAnimations,
   ...supplementalPhysiologyAnimations,
   ...sexSpecificPhysiologyAnimations,
+  ...wholeBodyPhysiologyAnimations,
 ];
 
 export const medicalRepository = {
