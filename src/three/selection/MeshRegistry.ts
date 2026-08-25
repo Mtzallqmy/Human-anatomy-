@@ -7,10 +7,16 @@ export class MeshRegistry {
     this.mapping = mapping;
   }
 
+  private resolve(object: THREE.Object3D): string | undefined {
+    const localStructureId = object.userData.localStructureId;
+    if (typeof localStructureId === "string" && localStructureId) return localStructureId;
+    return this.mapping[object.name];
+  }
+
   getStructureId(object: THREE.Object3D): string | undefined {
     let current: THREE.Object3D | null = object;
     while (current) {
-      const structureId = this.mapping[current.name];
+      const structureId = this.resolve(current);
       if (structureId) return structureId;
       current = current.parent;
     }
@@ -20,7 +26,7 @@ export class MeshRegistry {
   getObjectsForStructure(root: THREE.Object3D, structureId: string): THREE.Object3D[] {
     const objects: THREE.Object3D[] = [];
     root.traverse((object) => {
-      if (this.mapping[object.name] === structureId) objects.push(object);
+      if (this.resolve(object) === structureId) objects.push(object);
     });
     return objects;
   }
