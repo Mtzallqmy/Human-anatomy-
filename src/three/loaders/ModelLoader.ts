@@ -1,4 +1,4 @@
-import type * as THREE from "three";
+import * as THREE from "three";
 import type { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { AnatomicalStructure, ModelAsset } from "@/src/types/medical";
 import { AssetCacheManager } from "@/src/three/loaders/AssetCacheManager";
@@ -38,7 +38,11 @@ function tokens(value: string) {
 }
 
 function identifiers(structure: AnatomicalStructure) {
-  const values = [structure.name.en, structure.latinName ?? "", structure.id.replace(/^ANAT_/, "").replaceAll("_", " ")];
+  const values = [
+    structure.name.en,
+    structure.latinName ?? "",
+    structure.id.replace(/^ANAT_/, "").replaceAll("_", " "),
+  ];
   return values.map(normalize).filter(Boolean);
 }
 
@@ -63,7 +67,26 @@ function scoreObject(structure: AnatomicalStructure, object: THREE.Object3D) {
   return best;
 }
 
+function normalizeModelBounds(scene: THREE.Group) {
+  scene.updateMatrixWorld(true);
+  let box = new THREE.Box3().setFromObject(scene);
+  if (box.isEmpty()) return;
+  const size = box.getSize(new THREE.Vector3());
+  const longest = Math.max(size.x, size.y, size.z);
+  if (!Number.isFinite(longest) || longest <= 0) return;
+
+  const targetLongestDimension = 4.8;
+  const scale = targetLongestDimension / longest;
+  scene.scale.multiplyScalar(scale);
+  scene.updateMatrixWorld(true);
+  box = new THREE.Box3().setFromObject(scene);
+  const center = box.getCenter(new THREE.Vector3());
+  scene.position.sub(center);
+  scene.updateMatrixWorld(true);
+}
+
 function adaptExternalModel(scene: THREE.Group, structures: AnatomicalStructure[]) {
+  normalizeModelBounds(scene);
   const selectable = structures.filter((structure) => structure.meshIds.length > 0);
   const objects: THREE.Object3D[] = [];
   scene.traverse((object) => {
@@ -83,6 +106,7 @@ function adaptExternalModel(scene: THREE.Group, structures: AnatomicalStructure[
     if (bestObject && bestScore >= 58) {
       bestObject.userData.localStructureId = structure.id;
       bestObject.userData.matchConfidence = bestScore;
+      bestObject.userData.systemId = structure.systemId;
     }
   }
 
