@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AppProviders } from "@/src/app/providers/AppProviders";
 import "./globals.css";
+import "./experience.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
