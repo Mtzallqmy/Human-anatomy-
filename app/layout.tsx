@@ -4,10 +4,12 @@ import "./globals.css";
 import "./experience.css";
 import "./panel-enhancements.css";
 
+const productionHost =
+  process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "human-anatomy-medical-atlas.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${productionHost}`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://human-anatomy-medical-atlas.hart-petty0y.chatgpt.site",
-  ),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Human Anatomy, Physiology & Pathology Atlas",
     template: "%s | Anatomica Medical Atlas",
