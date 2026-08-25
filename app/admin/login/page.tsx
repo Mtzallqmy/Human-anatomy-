@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HeartPulse, LockKeyhole } from "lucide-react";
 import { useAuth } from "@/src/features/auth/AuthProvider";
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const { signIn, signUp } = useAuth();
   const router = useRouter();
   const search = useSearchParams();
@@ -93,5 +93,19 @@ export default function AdminLoginPage() {
         </small>
       </section>
     </main>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="admin-login">
+          <div className="admin-state">Preparing secure sign in…</div>
+        </main>
+      }
+    >
+      <AdminLoginForm />
+    </Suspense>
   );
 }
