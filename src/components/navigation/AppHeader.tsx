@@ -13,10 +13,10 @@ export function AppHeader({ atlas = false }: { atlas?: boolean }) {
   const mobileMenuOpen = useUIStore((state) => state.mobileMenuOpen);
   const setMobileMenuOpen = useUIStore((state) => state.setMobileMenuOpen);
   const links = [
-    { href: "/atlas", label: t("nav.atlas") },
-    { href: "/atlas/human-body", label: t("nav.systems") },
-    { href: "/imaging/IMG_CHEST_CT_EDU", label: t("nav.imaging") },
-    { href: "/references", label: t("nav.references") },
+    { href: "/atlas", label: t("nav.atlas"), active: pathname === "/atlas" || pathname.startsWith("/atlas/") },
+    { href: "/#systems", label: t("nav.systems"), active: pathname.startsWith("/systems/") },
+    { href: "/imaging/IMG_CHEST_CT_EDU", label: t("nav.imaging"), active: pathname.startsWith("/imaging") },
+    { href: "/references", label: t("nav.references"), active: pathname.startsWith("/references") },
   ];
 
   return (
@@ -43,13 +43,7 @@ export function AppHeader({ atlas = false }: { atlas?: boolean }) {
           <Link
             key={link.href}
             href={link.href}
-            className={
-              pathname === link.href ||
-              (link.href === "/atlas" && pathname === "/atlas") ||
-              (link.href.startsWith("/imaging") && pathname.startsWith("/imaging"))
-                ? "nav-link nav-link--active"
-                : "nav-link"
-            }
+            className={link.active ? "nav-link nav-link--active" : "nav-link"}
             onClick={() => setMobileMenuOpen(false)}
           >
             {link.label}

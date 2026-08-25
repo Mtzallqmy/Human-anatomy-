@@ -63,6 +63,9 @@ export const useViewerStore = create<ViewerState>((set) => ({
     set((state) => ({
       selectedSystemId,
       selectedStructureId: rootStructureId ?? state.selectedStructureId,
+      visibleSystemIds: state.visibleSystemIds.includes(selectedSystemId)
+        ? state.visibleSystemIds
+        : [...state.visibleSystemIds, selectedSystemId],
       hiddenStructureIds: [],
       isolatedStructureId: null,
       xrayMode: false,
