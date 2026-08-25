@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { allHumanStructures, expandedDiseases } from "@/src/data/anatomy/humanBodyCatalog";
+import { supplementalStructures } from "@/src/data/anatomy/comprehensiveSystems";
 import { meshRegistry, modelAssets } from "@/src/data/assets/modelAssets";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
 import { scientificReferences } from "@/src/data/references/references";
@@ -13,6 +14,32 @@ import type {
 } from "@/src/types/medical";
 
 type DataSource = "local" | "supabase";
+
+const localStructures = [...allHumanStructures, ...supplementalStructures];
+const localDiseases = [...heartDiseases, ...expandedDiseases];
+
+function mergeById<T extends { id: string }>(primary: T[], fallback: T[]): T[] {
+  const merged = new Map(fallback.map((item) => [item.id, item]));
+  for (const item of primary) merged.set(item.id, item);
+  return [...merged.values()];
+}
+
+function mergeSystems(remoteSystems: BodySystem[]): BodySystem[] {
+  const remote = new Map(remoteSystems.map((system) => [system.id, system]));
+  return bodySystems.map((localSystem) => {
+    const remoteSystem = remote.get(localSystem.id);
+    if (!remoteSystem) return localSystem;
+    return {
+      ...localSystem,
+      ...remoteSystem,
+      available: localSystem.available || remoteSystem.available,
+      rootStructureIds: remoteSystem.rootStructureIds.length
+        ? remoteSystem.rootStructureIds
+        : localSystem.rootStructureIds,
+      organIds: remoteSystem.organIds.length ? remoteSystem.organIds : localSystem.organIds,
+    };
+  });
+}
 
 interface ContentState {
   searchQuery: string;
@@ -41,8 +68,8 @@ interface ContentState {
 export const useContentStore = create<ContentState>((set) => ({
   searchQuery: "",
   systems: bodySystems,
-  structures: allHumanStructures,
-  diseases: [...heartDiseases, ...expandedDiseases],
+  structures: localStructures,
+  diseases: localDiseases,
   references: scientificReferences,
   assets: modelAssets,
   meshRegistry: { ...meshRegistry },
@@ -50,14 +77,24 @@ export const useContentStore = create<ContentState>((set) => ({
   isLoading: false,
   error: null,
   setSearchQuery: (searchQuery) => set({ searchQuery }),
-  setSystems: (systems) => set({ systems }),
+  setSystems: (systems) => set({ systems: mergeSystems(systems) }),
   setLoading: (isLoading) => set({ isLoading }),
-  setRemoteBundle: (bundle) => set({ ...bundle, dataSource: "supabase", isLoading: false, error: null }),
+  setRemoteBundle: (bundle) =>
+    set({
+      structures: mergeById(bundle.structures, supplementalStructures),
+      diseases: mergeById(bundle.diseases, localDiseases),
+      references: mergeById(bundle.references, scientificReferences),
+      assets: mergeById(bundle.assets, modelAssets),
+      meshRegistry: { ...meshRegistry, ...bundle.meshRegistry },
+      dataSource: "supabase",
+      isLoading: false,
+      error: null,
+    }),
   useFallback: (error) =>
     set({
       systems: bodySystems,
-      structures: allHumanStructures,
-      diseases: [...heartDiseases, ...expandedDiseases],
+      structures: localStructures,
+      diseases: localDiseases,
       references: scientificReferences,
       assets: modelAssets,
       meshRegistry: { ...meshRegistry },
