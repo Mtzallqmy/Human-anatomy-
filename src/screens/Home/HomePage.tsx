@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -63,15 +63,7 @@ export function HomePage() {
       gsap.fromTo(
         "[data-system-card]",
         { opacity: 0, y: 16 },
-        {
-          opacity: 1,
-          y: 0,
-          stagger: 0.035,
-          duration: 0.55,
-          ease: "power2.out",
-          scrollTrigger: undefined,
-          delay: 0.22,
-        },
+        { opacity: 1, y: 0, stagger: 0.035, duration: 0.55, ease: "power2.out", delay: 0.22 },
       );
     }, pageRef);
     return () => context.revert();
@@ -197,7 +189,7 @@ export function HomePage() {
                   className="system-showcase-card"
                   key={system.id}
                   data-system-card
-                  style={{ "--system-accent": system.accentColor } as React.CSSProperties}
+                  style={{ "--system-accent": system.accentColor } as CSSProperties}
                 >
                   <div className="system-showcase-top">
                     <span>{String(index + 1).padStart(2, "0")}</span>
