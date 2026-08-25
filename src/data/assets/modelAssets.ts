@@ -24,7 +24,7 @@ type AssetDefinition = {
 };
 
 const definitions: AssetDefinition[] = [
-  { id: "MODEL_ZANATOMY_FULL_BODY", systemId: "SYS_FULL_BODY", rootStructureId: "ANAT_HUMAN_BODY", bundle: "full-body", lod: "detailed" },
+  { id: "MODEL_PROCEDURAL_FULL_BODY", systemId: "SYS_FULL_BODY", rootStructureId: "ANAT_HUMAN_BODY", lod: "simplified" },
   { id: "MODEL_ZANATOMY_CARDIOVASCULAR", systemId: "SYS_CARDIOVASCULAR", rootStructureId: "ANAT_HEART", bundle: "cardiovascular", lod: "detailed" },
   { id: "MODEL_ZANATOMY_RESPIRATORY", systemId: "SYS_RESPIRATORY", rootStructureId: "ANAT_RESPIRATORY", bundle: "respiratory", lod: "detailed" },
   { id: "MODEL_ZANATOMY_DIGESTIVE", systemId: "SYS_DIGESTIVE", rootStructureId: "ANAT_DIGESTIVE", bundle: "digestive", lod: "detailed" },
