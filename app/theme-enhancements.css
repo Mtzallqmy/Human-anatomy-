@@ -1,0 +1,159 @@
+:root,
+html[data-theme="dark"] {
+  --background: #090d12;
+  --surface: #0d1218;
+  --surface-raised: #111820;
+  --surface-hover: #151e27;
+  --surface-glass: rgba(12, 17, 23, 0.9);
+  --foreground: #edf2f4;
+  --muted: #98a6b1;
+  --subtle: #66737e;
+  --border: rgba(189, 204, 215, 0.12);
+  --border-strong: rgba(189, 204, 215, 0.2);
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --background: #f7f9fb;
+  --surface: #ffffff;
+  --surface-raised: #f1f5f8;
+  --surface-hover: #e9f0f5;
+  --surface-glass: rgba(255, 255, 255, 0.94);
+  --foreground: #17212a;
+  --muted: #546472;
+  --subtle: #748390;
+  --border: rgba(43, 61, 75, 0.12);
+  --border-strong: rgba(43, 61, 75, 0.2);
+  --accent-soft: rgba(180, 90, 84, 0.1);
+  --blue-soft: rgba(86, 131, 169, 0.11);
+  color-scheme: light;
+}
+
+html[data-theme="comfort"] {
+  --background: #f3f1e8;
+  --surface: #faf8f0;
+  --surface-raised: #eeece2;
+  --surface-hover: #e5e3d9;
+  --surface-glass: rgba(250, 248, 240, 0.95);
+  --foreground: #24302e;
+  --muted: #5c6964;
+  --subtle: #7b8580;
+  --border: rgba(55, 74, 68, 0.13);
+  --border-strong: rgba(55, 74, 68, 0.22);
+  --accent: #9b625d;
+  --accent-soft: rgba(155, 98, 93, 0.1);
+  --blue: #54798a;
+  --blue-soft: rgba(84, 121, 138, 0.12);
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Segoe UI Variable", "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+:lang(ar),
+[dir="rtl"],
+.bilingual-medical-text__ar {
+  font-family: "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-raised);
+}
+.theme-switcher button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+.theme-switcher button.is-active {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.bilingual-medical-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.bilingual-medical-text__en {
+  display: block;
+  color: var(--foreground);
+  font-weight: 550;
+  line-height: 1.55;
+}
+.bilingual-medical-text__ar {
+  display: block;
+  color: var(--muted);
+  line-height: 1.8;
+  font-weight: 430;
+}
+.bilingual-medical-text--compact {
+  gap: 2px;
+}
+.bilingual-medical-text--compact .bilingual-medical-text__en,
+.bilingual-medical-text--compact .bilingual-medical-text__ar {
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+html[data-theme="light"] .app-header,
+html[data-theme="comfort"] .app-header,
+html[data-theme="light"] .system-sidebar,
+html[data-theme="comfort"] .system-sidebar,
+html[data-theme="light"] .structure-panel,
+html[data-theme="comfort"] .structure-panel,
+html[data-theme="light"] .viewer-context-strip,
+html[data-theme="comfort"] .viewer-context-strip {
+  background: var(--surface-glass);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+html[data-theme="light"] .nav-link,
+html[data-theme="comfort"] .nav-link,
+html[data-theme="light"] .system-item,
+html[data-theme="comfort"] .system-item,
+html[data-theme="light"] .structure-item,
+html[data-theme="comfort"] .structure-item {
+  color: var(--muted);
+}
+html[data-theme="light"] .nav-link--active,
+html[data-theme="comfort"] .nav-link--active,
+html[data-theme="light"] .system-item--active,
+html[data-theme="comfort"] .system-item--active,
+html[data-theme="light"] .structure-item--active,
+html[data-theme="comfort"] .structure-item--active {
+  color: var(--foreground);
+}
+
+html[data-theme="light"] .medical-content .content-section,
+html[data-theme="comfort"] .medical-content .content-section {
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+
+@media (max-width: 980px) {
+  .theme-switcher button span { display: none; }
+  .theme-switcher button { width: 34px; justify-content: center; padding: 0; }
+}
