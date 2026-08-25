@@ -1,8 +1,9 @@
 import { allHumanStructures } from "@/src/data/anatomy/humanBodyCatalog";
 import { supplementalStructures } from "@/src/data/anatomy/comprehensiveSystems";
+import { sexSpecificStructures } from "@/src/data/anatomy/sexSpecificAtlas";
 import type { ModelAsset } from "@/src/types/medical";
 
-const catalogStructures = [...allHumanStructures, ...supplementalStructures];
+const catalogStructures = [...allHumanStructures, ...supplementalStructures, ...sexSpecificStructures];
 const VANATOME_MODEL_BASE = "https://atlas.vanatome.vixotic.in/models";
 
 const licensedAttribution = {
@@ -25,6 +26,8 @@ type AssetDefinition = {
 
 const definitions: AssetDefinition[] = [
   { id: "MODEL_PROCEDURAL_FULL_BODY", systemId: "SYS_FULL_BODY", rootStructureId: "ANAT_HUMAN_BODY", lod: "simplified" },
+  { id: "MODEL_ZANATOMY_MALE_FULL_BODY", systemId: "SYS_MALE_BODY", rootStructureId: "ANAT_MALE_BODY", bundle: "full-body", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_FEMALE_FULL_BODY", systemId: "SYS_FEMALE_BODY", rootStructureId: "ANAT_FEMALE_BODY", bundle: "full-body", lod: "detailed" },
   { id: "MODEL_ZANATOMY_CARDIOVASCULAR", systemId: "SYS_CARDIOVASCULAR", rootStructureId: "ANAT_HEART", bundle: "cardiovascular", lod: "detailed" },
   { id: "MODEL_ZANATOMY_RESPIRATORY", systemId: "SYS_RESPIRATORY", rootStructureId: "ANAT_RESPIRATORY", bundle: "respiratory", lod: "detailed" },
   { id: "MODEL_ZANATOMY_DIGESTIVE", systemId: "SYS_DIGESTIVE", rootStructureId: "ANAT_DIGESTIVE", bundle: "digestive", lod: "detailed" },
@@ -36,6 +39,8 @@ const definitions: AssetDefinition[] = [
   { id: "MODEL_ZANATOMY_ENDOCRINE", systemId: "SYS_ENDOCRINE", rootStructureId: "ANAT_ENDOCRINE", bundle: "endocrine", lod: "detailed" },
   { id: "MODEL_ZANATOMY_LYMPHATIC", systemId: "SYS_LYMPHATIC", rootStructureId: "ANAT_LYMPHATIC", bundle: "lymphatic", lod: "detailed" },
   { id: "MODEL_ZANATOMY_REPRODUCTIVE", systemId: "SYS_REPRODUCTIVE", rootStructureId: "ANAT_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_MALE_REPRODUCTIVE", systemId: "SYS_MALE_REPRODUCTIVE", rootStructureId: "ANAT_MALE_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_FEMALE_REPRODUCTIVE", systemId: "SYS_FEMALE_REPRODUCTIVE", rootStructureId: "ANAT_FEMALE_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
   { id: "MODEL_PROCEDURAL_INTEGUMENTARY", systemId: "SYS_INTEGUMENTARY", rootStructureId: "ANAT_INTEGUMENTARY" },
 ];
 
