@@ -2,6 +2,7 @@
 
 import { ChevronDown, X } from "lucide-react";
 import { useEffect } from "react";
+import { BilingualMedicalText } from "@/src/components/medical/BilingualMedicalText";
 import { StructureBreadcrumb } from "@/src/components/medical/StructureBreadcrumb";
 import { MedicalTabs } from "@/src/components/medical/MedicalTabs";
 import { AnatomyPanel } from "@/src/components/panels/AnatomyPanel";
@@ -16,7 +17,7 @@ import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
 
 export function StructureInfoPanel() {
-  const { t, localize } = useLocale();
+  const { t } = useLocale();
   const structureId = useViewerStore((state) => state.selectedStructureId);
   const tab = useUIStore((state) => state.activeMedicalTab);
   const setTab = useUIStore((state) => state.setActiveMedicalTab);
@@ -39,36 +40,21 @@ export function StructureInfoPanel() {
 
   return (
     <aside className={`structure-panel${panelOpen ? " structure-panel--open" : ""}`}>
-      <button
-        className="panel-drag-handle"
-        type="button"
-        aria-label={panelOpen ? t("common.close") : t("atlas.mobileInfo")}
-        onClick={() => setPanelOpen(!panelOpen)}
-      >
-        <i />
-      </button>
+      <button className="panel-drag-handle" type="button" aria-label={panelOpen ? t("common.close") : t("atlas.mobileInfo")} onClick={() => setPanelOpen(!panelOpen)}><i /></button>
       <div className="structure-panel-heading">
         <span>{t("atlas.selectedStructure")}</span>
-        <button type="button" aria-label={t("common.close")} onClick={() => setPanelOpen(false)}>
-          <X size={15} />
-        </button>
+        <button type="button" aria-label={t("common.close")} onClick={() => setPanelOpen(false)}><X size={15} /></button>
       </div>
       <StructureBreadcrumb structure={structure} />
-      <div className="structure-title">
-        <h2>{localize(structure.name)}</h2>
-        {structure.latinName && <p>{structure.latinName}</p>}
+      <div className="structure-title structure-title--bilingual">
+        <h2><BilingualMedicalText value={structure.name} /></h2>
+        {structure.latinName && <p dir="ltr">{structure.latinName}</p>}
       </div>
       <button type="button" className="mobile-panel-expand" onClick={() => setPanelOpen(!panelOpen)}>
-        {t("atlas.mobileInfo")}
-        <ChevronDown size={14} />
+        {t("atlas.mobileInfo")}<ChevronDown size={14} />
       </button>
       <MedicalTabs hasImaging={hasImaging} />
-      <div
-        id="medical-tab-content"
-        className="medical-tab-content"
-        role="tabpanel"
-        aria-labelledby={`medical-tab-${tab}`}
-      >
+      <div id="medical-tab-content" className="medical-tab-content" role="tabpanel" aria-labelledby={`medical-tab-${tab}`}>
         {tab === "anatomy" && <AnatomyPanel structure={structure} />}
         {tab === "physiology" && <PhysiologyPanel structure={structure} />}
         {tab === "pathology" && <PathologyPanel structure={structure} />}
