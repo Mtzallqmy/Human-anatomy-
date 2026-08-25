@@ -8,13 +8,14 @@ import {
   supplementalStructures,
 } from "@/src/data/anatomy/comprehensiveSystems";
 import { modelAssets } from "@/src/data/assets/modelAssets";
+import { comprehensiveDiseases } from "@/src/data/pathology/comprehensiveDiseases";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
 import { scientificReferences } from "@/src/data/references/references";
 import { bodySystems } from "@/src/data/systems/systems";
 import type { SearchResult } from "@/src/types/medical";
 
 const structuresCatalog = [...allHumanStructures, ...supplementalStructures];
-const diseasesCatalog = [...heartDiseases, ...expandedDiseases];
+const diseasesCatalog = [...heartDiseases, ...expandedDiseases, ...comprehensiveDiseases];
 const physiologyCatalog = [...physiologyAnimations, ...supplementalPhysiologyAnimations];
 
 export const medicalRepository = {
