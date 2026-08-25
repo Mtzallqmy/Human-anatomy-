@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { imagingStudies } from "@/src/data/imaging/imagingStudies";
+import { imagingStudies } from "@/src/data/imaging/imagingCatalog";
 import { ImagingPage } from "@/src/screens/Imaging/ImagingPage";
 
 interface Props {
