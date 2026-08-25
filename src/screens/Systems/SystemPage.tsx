@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import Link from "next/link";
 import {
   Activity,
@@ -60,7 +60,7 @@ export function SystemPage({ systemId }: { systemId: string }) {
               </a>
             </div>
           </div>
-          <div className="system-hero-mark" aria-hidden="true" style={{ "--system-accent": system.accentColor } as React.CSSProperties}>
+          <div className="system-hero-mark" aria-hidden="true" style={{ "--system-accent": system.accentColor } as CSSProperties}>
             <Network size={92} strokeWidth={0.8} />
             <span>{String(detailedStructures.length).padStart(2, "0")}</span>
           </div>
