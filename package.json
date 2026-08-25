@@ -16,10 +16,12 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src app docs README.md",
     "format:check": "prettier --check src app docs README.md",
-    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate"
+    "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
+    "db:seed:render": "node --import tsx scripts/render-supabase-seed.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.112.4",
+    "@tanstack/react-query": "5.102.3",
     "drizzle-orm": "0.45.2",
     "gsap": "^3.15.0",
     "i18next": "^26.4.0",
@@ -29,6 +31,7 @@
     "react-dom": "19.2.6",
     "react-i18next": "^17.0.12",
     "three": "^0.185.1",
+    "zod": "4.4.3",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

@@ -2,14 +2,16 @@
 
 import { ArrowUpRight, BookOpen } from "lucide-react";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
+import { MedicalContentBootstrap } from "@/src/features/anatomy/MedicalContentBootstrap";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 
 export function ReferencesPage() {
   const { t } = useLocale();
-  const references = medicalRepository.getReferences();
+  const references = useContentStore((state) => state.references);
   return (
     <div className="editorial-page">
+      <MedicalContentBootstrap />
       <AppHeader />
       <main className="editorial-main">
         <section className="editorial-hero">

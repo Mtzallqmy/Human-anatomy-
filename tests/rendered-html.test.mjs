@@ -39,6 +39,8 @@ for (const route of [
   "/systems/cardiovascular",
   "/disease/DIS_AORTIC_STENOSIS",
   "/references",
+  "/admin/login",
+  "/admin",
 ]) {
   test(`renders ${route}`, async () => {
     const response = await render(route);

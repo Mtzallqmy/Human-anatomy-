@@ -2,11 +2,55 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, Search, X } from "lucide-react";
+import { supabaseMedicalRepository } from "@/src/data-access/medical/supabaseMedicalRepository";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
 import { useContentStore } from "@/src/store/contentStore";
 import { useViewerStore } from "@/src/store/viewerStore";
+import type { SearchResult } from "@/src/types/medical";
+
+function searchLocalCatalog(
+  query: string,
+  structures: ReturnType<typeof useContentStore.getState>["structures"],
+  systems: ReturnType<typeof useContentStore.getState>["systems"],
+  diseases: ReturnType<typeof useContentStore.getState>["diseases"],
+): SearchResult[] {
+  const normalized = query.trim().toLocaleLowerCase();
+  if (normalized.length < 2) return [];
+  const matches = (en: string, ar: string, latin?: string) =>
+    en.toLocaleLowerCase().includes(normalized) ||
+    ar.includes(normalized) ||
+    latin?.toLocaleLowerCase().includes(normalized);
+  return [
+    ...structures
+      .filter((item) => matches(item.name.en, item.name.ar, item.latinName))
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: "structure" as const,
+        systemId: item.systemId,
+        href: `/atlas/structure/${item.id}`,
+      })),
+    ...systems
+      .filter((item) => matches(item.name.en, item.name.ar))
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: "system" as const,
+        systemId: item.id,
+        href: `/systems/${item.slug}`,
+      })),
+    ...diseases
+      .filter((item) => matches(item.name.en, item.name.ar))
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: "disease" as const,
+        href: `/disease/${item.id}`,
+      })),
+  ].slice(0, 12);
+}
 
 export function SearchBar() {
   const { t, localize } = useLocale();
@@ -14,10 +58,30 @@ export function SearchBar() {
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const query = useContentStore((state) => state.searchQuery);
+  const structures = useContentStore((state) => state.structures);
+  const systems = useContentStore((state) => state.systems);
+  const diseases = useContentStore((state) => state.diseases);
+  const dataSource = useContentStore((state) => state.dataSource);
   const setQuery = useContentStore((state) => state.setSearchQuery);
   const setStructure = useViewerStore((state) => state.setSelectedStructure);
-  const results = useMemo(() => medicalRepository.search(query), [query]);
+  const localResults = useMemo(
+    () => searchLocalCatalog(query, structures, systems, diseases),
+    [diseases, query, structures, systems],
+  );
+  const remoteSearch = useQuery({
+    queryKey: ["medical-search", debouncedQuery],
+    queryFn: () => supabaseMedicalRepository.search(debouncedQuery),
+    enabled: dataSource === "supabase" && debouncedQuery.length >= 2,
+    staleTime: 60_000,
+  });
+  const results = remoteSearch.data ?? localResults;
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 220);
+    return () => window.clearTimeout(timeout);
+  }, [query]);
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {

@@ -5,6 +5,7 @@ function createStages(
   moderate: LocalizedText,
   advanced: LocalizedText,
   color: string,
+  scaleMultipliers?: [number, number, number],
 ): DiseaseStage[] {
   return [
     {
@@ -18,21 +19,34 @@ function createStages(
       order: 1,
       name: { en: "Early", ar: "مبكر" },
       description: early,
-      visualState: { materialPreset: "early-disease", color },
+      visualState: {
+        materialPreset: "early-disease",
+        color,
+        scaleMultiplier: scaleMultipliers?.[0],
+      },
     },
     {
       id: "moderate",
       order: 2,
       name: { en: "Moderate", ar: "متوسط" },
       description: moderate,
-      visualState: { materialPreset: "moderate-disease", color },
+      visualState: {
+        materialPreset: "moderate-disease",
+        color,
+        scaleMultiplier: scaleMultipliers?.[1],
+      },
     },
     {
       id: "advanced",
       order: 3,
       name: { en: "Advanced", ar: "متقدم" },
       description: advanced,
-      visualState: { materialPreset: "advanced-disease", morphTarget: "diseaseSeverity", color },
+      visualState: {
+        materialPreset: "advanced-disease",
+        morphTarget: "diseaseSeverity",
+        color,
+        scaleMultiplier: scaleMultipliers?.[2],
+      },
     },
   ];
 }
@@ -196,6 +210,7 @@ export const heartDiseases: Disease[] = [
         ar: "قد يضعف تبدل البنية الشديد الامتلاء ويرفع احتمال عدم الاستقرار الكهربائي.",
       },
       "#dd8471",
+      [0.05, 0.09, 0.13],
     ),
     referenceIds: ["REF_ROBBINS_COTRAN", "REF_GUYTON_HALL"],
   },

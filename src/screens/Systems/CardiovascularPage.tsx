@@ -3,17 +3,21 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, HeartPulse } from "lucide-react";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
+import { MedicalContentBootstrap } from "@/src/features/anatomy/MedicalContentBootstrap";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 
 export function CardiovascularPage() {
   const { t, localize, isRTL } = useLocale();
-  const structures = medicalRepository.getSystemStructures("SYS_CARDIOVASCULAR");
-  const diseases = medicalRepository.getDiseases();
-  const references = medicalRepository.getReferences();
+  const structures = useContentStore((state) =>
+    state.structures.filter((structure) => structure.systemId === "SYS_CARDIOVASCULAR"),
+  );
+  const diseases = useContentStore((state) => state.diseases);
+  const references = useContentStore((state) => state.references);
 
   return (
     <div className="editorial-page">
+      <MedicalContentBootstrap />
       <AppHeader />
       <main className="editorial-main">
         <section className="editorial-hero">

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { SearchBar } from "@/src/components/navigation/SearchBar";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
 
@@ -35,14 +35,17 @@ const icons: Record<string, LucideIcon> = {
 
 export function SystemSidebar() {
   const { t, localize } = useLocale();
-  const systems = medicalRepository.getSystems();
+  const systems = useContentStore((state) => state.systems);
+  const allStructures = useContentStore((state) => state.structures);
+  const contentError = useContentStore((state) => state.error);
   const selectedSystemId = useViewerStore((state) => state.selectedSystemId);
   const selectedStructureId = useViewerStore((state) => state.selectedStructureId);
   const selectSystem = useViewerStore((state) => state.setSelectedSystem);
   const selectStructure = useViewerStore((state) => state.setSelectedStructure);
+  const showAllStructures = useViewerStore((state) => state.showAllStructures);
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
   const setSidebarOpen = useUIStore((state) => state.setSidebarOpen);
-  const structures = medicalRepository.getSystemStructures(selectedSystemId);
+  const structures = allStructures.filter((structure) => structure.systemId === selectedSystemId);
 
   return (
     <aside
@@ -61,6 +64,7 @@ export function SystemSidebar() {
         </button>
       </div>
       <SearchBar />
+      {contentError && <p className="content-source-warning">{contentError}</p>}
       <div className="systems-list">
         {systems.map((system) => {
           const Icon = icons[system.icon] ?? Circle;
@@ -95,8 +99,10 @@ export function SystemSidebar() {
             type="button"
             className={`structure-item${structure.id === selectedStructureId ? " structure-item--active" : ""}`}
             onClick={() => {
+              if (!structure.parentId) showAllStructures();
               selectStructure(structure.id);
               setSidebarOpen(false);
+              useUIStore.getState().setInformationPanelOpen(true);
             }}
           >
             <span className="structure-indicator" />

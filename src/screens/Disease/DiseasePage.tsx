@@ -3,15 +3,22 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
+import { MedicalContentBootstrap } from "@/src/features/anatomy/MedicalContentBootstrap";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 import { usePathologyStore } from "@/src/store/pathologyStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
 
 export function DiseasePage({ diseaseId }: { diseaseId: string }) {
   const { t, localize, isRTL } = useLocale();
-  const disease = medicalRepository.getDiseaseById(diseaseId);
+  const disease = useContentStore((state) => state.diseases.find((item) => item.id === diseaseId));
+  const structures = useContentStore((state) => state.structures);
+  const references = useContentStore((state) =>
+    state.references.filter((reference) =>
+      state.diseases.find((item) => item.id === diseaseId)?.referenceIds.includes(reference.id),
+    ),
+  );
   const selectDisease = usePathologyStore((state) => state.selectDisease);
   const selectStructure = useViewerStore((state) => state.setSelectedStructure);
   const setMedicalTab = useUIStore((state) => state.setActiveMedicalTab);
@@ -19,6 +26,7 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
   if (!disease)
     return (
       <div className="editorial-page">
+        <MedicalContentBootstrap />
         <AppHeader />
         <main className="editorial-main">
           <p>{t("common.noResults")}</p>
@@ -27,7 +35,6 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
       </div>
     );
 
-  const references = medicalRepository.getReferencesByIds(disease.referenceIds);
   const details = [
     { label: t("medical.etiology"), value: disease.etiology },
     { label: t("medical.pathogenesis"), value: disease.pathogenesis },
@@ -37,6 +44,7 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
 
   return (
     <div className="editorial-page">
+      <MedicalContentBootstrap />
       <AppHeader />
       <main className="editorial-main">
         <section className="editorial-hero disease-hero">
@@ -85,7 +93,7 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
           </div>
           <div className="affected-links">
             {disease.affectedStructureIds.map((id) => {
-              const structure = medicalRepository.getStructureById(id);
+              const structure = structures.find((item) => item.id === id);
               return structure ? (
                 <Link key={id} href={`/atlas/structure/${id}`}>
                   {localize(structure.name)}

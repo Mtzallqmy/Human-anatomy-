@@ -11,6 +11,7 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
   const bloodFlowEnabled = useViewerStore((state) => state.bloodFlowEnabled);
   const setBloodFlowEnabled = useViewerStore((state) => state.setBloodFlowEnabled);
   const selectStructure = useViewerStore((state) => state.setSelectedStructure);
+  const selectedStructureId = useViewerStore((state) => state.selectedStructureId);
 
   return (
     <div className="medical-content">
@@ -42,7 +43,12 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
         <ol className="flow-steps">
           {bloodFlowSteps.map((step, index) => (
             <li key={`${step.structureId}-${index}`}>
-              <button type="button" onClick={() => selectStructure(step.structureId)}>
+              <button
+                type="button"
+                className={selectedStructureId === step.structureId ? "flow-step--active" : ""}
+                onClick={() => selectStructure(step.structureId)}
+              >
+                <span className="flow-step-index">{index + 1}</span>
                 <i
                   className={`flow-dot flow-dot--${step.oxygenation === "oxygenated" ? "arterial" : "venous"}`}
                 />

@@ -55,6 +55,7 @@ export interface DiseaseVisualState {
   materialPreset?: string;
   animationPreset?: string;
   color?: string;
+  scaleMultiplier?: number;
 }
 
 export interface DiseaseStage {
@@ -82,6 +83,7 @@ export interface ModelAsset {
   id: string;
   url: string | null;
   systemId: string;
+  rootStructureId: string;
   structureIds: string[];
   format: "glb" | "gltf" | "procedural";
   attribution: LocalizedText;

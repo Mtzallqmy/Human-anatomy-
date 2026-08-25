@@ -2,11 +2,13 @@
 
 import { ArrowUpRight, BookOpen } from "lucide-react";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 
 export function ReferencesPanel({ referenceIds }: { referenceIds: string[] }) {
   const { t } = useLocale();
-  const references = medicalRepository.getReferencesByIds(referenceIds);
+  const references = useContentStore((state) =>
+    state.references.filter((reference) => referenceIds.includes(reference.id)),
+  );
   return (
     <div className="medical-content">
       <section className="content-section">

@@ -5,17 +5,16 @@ import { ArrowUpRight, TriangleAlert } from "lucide-react";
 import { CompareToggle } from "@/src/components/medical/CompareToggle";
 import { DiseaseProgressSlider } from "@/src/components/medical/DiseaseProgressSlider";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 import { usePathologyStore } from "@/src/store/pathologyStore";
-import type { AnatomicalStructure, Disease } from "@/src/types/medical";
+import type { AnatomicalStructure } from "@/src/types/medical";
 
 export function PathologyPanel({ structure }: { structure: AnatomicalStructure }) {
   const { t, localize } = useLocale();
   const selectedDiseaseId = usePathologyStore((state) => state.selectedDiseaseId);
   const selectDisease = usePathologyStore((state) => state.selectDisease);
-  const diseases = structure.relatedDiseaseIds
-    .map((id) => medicalRepository.getDiseaseById(id))
-    .filter((disease): disease is Disease => Boolean(disease));
+  const allDiseases = useContentStore((state) => state.diseases);
+  const diseases = allDiseases.filter((disease) => structure.relatedDiseaseIds.includes(disease.id));
   const activeDisease = diseases.find((disease) => disease.id === selectedDiseaseId);
 
   return (

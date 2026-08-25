@@ -1,0 +1,410 @@
+import { heartStructures } from "@/src/data/anatomy/heartStructures";
+import { modelAssets } from "@/src/data/assets/modelAssets";
+import { heartDiseases } from "@/src/data/pathology/heartDiseases";
+import { scientificReferences } from "@/src/data/references/references";
+import { bodySystems } from "@/src/data/systems/systems";
+
+function literal(value: string | number | boolean | null | undefined): string {
+  if (value === null || value === undefined) return "null";
+  if (typeof value === "number") return String(value);
+  if (typeof value === "boolean") return value ? "true" : "false";
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+function json(value: unknown): string {
+  return `${literal(JSON.stringify(value))}::jsonb`;
+}
+
+function textArray(values: string[]): string {
+  return `array[${values.map(literal).join(", ")}]::text[]`;
+}
+
+function rows(values: string[][]): string {
+  return values.map((row) => `  (${row.join(", ")})`).join(",\n");
+}
+
+const output: string[] = [
+  "-- Generated from the typed cardiovascular MVP datasets.",
+  "-- Re-run with: npm run db:seed:render",
+  "begin;",
+];
+
+output.push(
+  "insert into public.systems (id, slug, canonical_name, status, is_available, sort_order, metadata) values",
+  rows(
+    bodySystems.map((system, index) => [
+      literal(system.id),
+      literal(system.slug),
+      literal(system.name.en),
+      literal("published"),
+      literal(system.available),
+      literal(index),
+      json({ icon: system.icon, accentColor: system.accentColor }),
+    ]),
+  ),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.system_translations (system_id, locale, name, description) values",
+  rows(
+    bodySystems.flatMap((system) =>
+      (["en", "ar"] as const).map((locale) => [
+        literal(system.id),
+        literal(locale),
+        literal(system.name[locale]),
+        literal(system.description[locale]),
+      ]),
+    ),
+  ),
+  "on conflict (system_id, locale) do nothing;",
+);
+
+const structuresByDepth = [...heartStructures].sort(
+  (a, b) => Number(Boolean(a.parentId)) - Number(Boolean(b.parentId)),
+);
+output.push(
+  "",
+  "insert into public.anatomical_structures (id, system_id, parent_id, slug, canonical_name, latin_name, status, sort_order, metadata) values",
+  rows(
+    structuresByDepth.map((structure, index) => [
+      literal(structure.id),
+      literal(structure.systemId),
+      literal(structure.parentId),
+      literal(structure.id.toLowerCase().replaceAll("_", "-")),
+      literal(structure.name.en),
+      literal(structure.latinName),
+      literal("published"),
+      literal(index),
+      json({ labelAnchor: structure.labelAnchor, studyNumber: structure.studyNumber }),
+    ]),
+  ),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.structure_translations (structure_id, locale, name, description, anatomy, physiology, location, blood_supply, innervation) values",
+  rows(
+    heartStructures.flatMap((structure) =>
+      (["en", "ar"] as const).map((locale) => [
+        literal(structure.id),
+        literal(locale),
+        literal(structure.name[locale]),
+        literal(structure.description[locale]),
+        literal(structure.anatomy[locale]),
+        literal(structure.physiology[locale]),
+        literal(structure.location[locale]),
+        literal(structure.bloodSupply?.[locale]),
+        literal(structure.innervation?.[locale]),
+      ]),
+    ),
+  ),
+  "on conflict (structure_id, locale) do nothing;",
+);
+
+const relationRows = heartStructures.flatMap((structure) =>
+  structure.relatedStructureIds.map((relatedId) => [
+    literal(structure.id),
+    literal(relatedId),
+    literal("related"),
+  ]),
+);
+output.push(
+  "",
+  "insert into public.structure_relations (structure_id, related_structure_id, relation_type) values",
+  rows(relationRows),
+  "on conflict (structure_id, related_structure_id, relation_type) do nothing;",
+);
+
+const synonyms = [
+  ["ANAT_HEART", "en", "Cardiac organ"],
+  ["ANAT_HEART", "ar", "الفؤاد"],
+  ["ANAT_HEART_LV", "en", "Left cardiac ventricle"],
+  ["ANAT_HEART_LV", "ar", "الحجرة البطينية اليسرى"],
+  ["ANAT_HEART_AORTA", "en", "Main artery"],
+  ["ANAT_HEART_AORTA", "ar", "الشريان الأورطي"],
+];
+output.push(
+  "",
+  "insert into public.structure_synonyms (structure_id, locale, synonym) values",
+  rows(
+    synonyms.map(([structureId, locale, synonym]) => [
+      literal(structureId),
+      literal(locale),
+      literal(synonym),
+    ]),
+  ),
+  "on conflict (structure_id, locale, synonym) do nothing;",
+);
+
+const physiologyTopics = [
+  {
+    id: "PHYS_BLOOD_FLOW",
+    slug: "blood-flow",
+    name: { en: "Blood flow", ar: "تدفق الدم" },
+    summary: {
+      en: "Movement of deoxygenated and oxygenated blood through the chambers, valves, lungs, and systemic circulation.",
+      ar: "حركة الدم غير المؤكسج والمؤكسج عبر الحجرات والصمامات والرئتين والدورة الجهازية.",
+    },
+    mechanism: {
+      en: "Pressure gradients generated by cardiac contraction move blood in one direction through competent valves.",
+      ar: "تنقل فروق الضغط الناتجة عن انقباض القلب الدم في اتجاه واحد عبر صمامات سليمة.",
+    },
+    structures: heartStructures.map((structure) => structure.id),
+    visualConfig: { animationPreset: "cardiovascular-blood-flow" },
+  },
+  {
+    id: "PHYS_CARDIAC_CYCLE",
+    slug: "cardiac-cycle",
+    name: { en: "Cardiac cycle", ar: "الدورة القلبية" },
+    summary: {
+      en: "The coordinated sequence of ventricular filling, contraction, ejection, and relaxation.",
+      ar: "التتابع المنسق لامتلاء البطينين وانقباضهما وقذف الدم وارتخائهما.",
+    },
+    mechanism: {
+      en: "Electrical activation and pressure changes coordinate chamber contraction with valve opening and closure.",
+      ar: "ينسق التنبيه الكهربائي وتغيرات الضغط انقباض الحجرات مع فتح الصمامات وإغلاقها.",
+    },
+    structures: [
+      "ANAT_HEART",
+      "ANAT_HEART_RA",
+      "ANAT_HEART_LA",
+      "ANAT_HEART_RV",
+      "ANAT_HEART_LV",
+      "ANAT_HEART_TRICUSPID",
+      "ANAT_HEART_MITRAL",
+      "ANAT_HEART_PULMONARY_VALVE",
+      "ANAT_HEART_AORTIC_VALVE",
+    ],
+    visualConfig: { animationPreset: "cardiac-cycle" },
+  },
+  {
+    id: "PHYS_ELECTRICAL_CONDUCTION",
+    slug: "electrical-conduction",
+    name: { en: "Electrical conduction", ar: "التوصيل الكهربائي" },
+    summary: {
+      en: "Ordered propagation of electrical activity that initiates atrial and ventricular contraction.",
+      ar: "انتشار منظم للنشاط الكهربائي يبدأ انقباض الأذينين والبطينين.",
+    },
+    mechanism: {
+      en: "Impulse formation in the sinoatrial node is followed by atrioventricular delay and rapid ventricular conduction.",
+      ar: "يتبع تولد النبضة في العقدة الجيبية تأخير أذيني بطيني ثم توصيل بطيني سريع.",
+    },
+    structures: [
+      "ANAT_HEART",
+      "ANAT_HEART_RA",
+      "ANAT_HEART_LA",
+      "ANAT_HEART_RV",
+      "ANAT_HEART_LV",
+      "ANAT_HEART_SEPTUM",
+    ],
+    visualConfig: { animationPreset: "electrical-conduction" },
+  },
+];
+output.push(
+  "",
+  "insert into public.physiology_topics (id, slug, canonical_name, status, sort_order, visual_config) values",
+  rows(
+    physiologyTopics.map((topic, index) => [
+      literal(topic.id),
+      literal(topic.slug),
+      literal(topic.name.en),
+      literal("published"),
+      literal(index),
+      json(topic.visualConfig),
+    ]),
+  ),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.physiology_translations (physiology_topic_id, locale, name, summary, mechanism) values",
+  rows(
+    physiologyTopics.flatMap((topic) =>
+      (["en", "ar"] as const).map((locale) => [
+        literal(topic.id),
+        literal(locale),
+        literal(topic.name[locale]),
+        literal(topic.summary[locale]),
+        literal(topic.mechanism[locale]),
+      ]),
+    ),
+  ),
+  "on conflict (physiology_topic_id, locale) do nothing;",
+  "",
+  "insert into public.structure_physiology (structure_id, physiology_topic_id, sort_order) values",
+  rows(
+    physiologyTopics.flatMap((topic, topicIndex) =>
+      topic.structures.map((structureId, index) => [
+        literal(structureId),
+        literal(topic.id),
+        literal(topicIndex * 100 + index),
+      ]),
+    ),
+  ),
+  "on conflict (structure_id, physiology_topic_id) do nothing;",
+);
+
+output.push(
+  "",
+  "insert into public.diseases (id, slug, canonical_name, status) values",
+  rows(
+    heartDiseases.map((disease) => [
+      literal(disease.id),
+      literal(disease.id.toLowerCase().replaceAll("_", "-")),
+      literal(disease.name.en),
+      literal("published"),
+    ]),
+  ),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.disease_translations (disease_id, locale, name, summary, etiology, pathogenesis, morphology, functional_effects) values",
+  rows(
+    heartDiseases.flatMap((disease) =>
+      (["en", "ar"] as const).map((locale) => [
+        literal(disease.id),
+        literal(locale),
+        literal(disease.name[locale]),
+        literal(disease.summary[locale]),
+        literal(disease.etiology[locale]),
+        literal(disease.pathogenesis[locale]),
+        literal(disease.morphology[locale]),
+        literal(disease.functionalEffects[locale]),
+      ]),
+    ),
+  ),
+  "on conflict (disease_id, locale) do nothing;",
+  "",
+  "insert into public.disease_structures (disease_id, structure_id, is_primary) values",
+  rows(
+    heartDiseases.flatMap((disease) =>
+      disease.affectedStructureIds.map((structureId, index) => [
+        literal(disease.id),
+        literal(structureId),
+        literal(index === 0),
+      ]),
+    ),
+  ),
+  "on conflict (disease_id, structure_id) do nothing;",
+  "",
+  "insert into public.disease_stages (id, disease_id, stage_order, progress_min, progress_max, visual_config) values",
+  rows(
+    heartDiseases.flatMap((disease) =>
+      disease.stages.map((stage, index) => {
+        const stageId = `${disease.id}_${stage.id.toUpperCase()}`;
+        const minimum = index === 0 ? 0 : Number(((index - 1) / 3 + 0.001).toFixed(3));
+        const maximum = index === 0 ? 0.12 : Number((index / 3).toFixed(3));
+        return [
+          literal(stageId),
+          literal(disease.id),
+          literal(stage.order),
+          literal(minimum),
+          literal(Math.min(1, maximum)),
+          json(stage.visualState ?? {}),
+        ];
+      }),
+    ),
+  ),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.disease_stage_translations (disease_stage_id, locale, name, description) values",
+  rows(
+    heartDiseases.flatMap((disease) =>
+      disease.stages.flatMap((stage) =>
+        (["en", "ar"] as const).map((locale) => [
+          literal(`${disease.id}_${stage.id.toUpperCase()}`),
+          literal(locale),
+          literal(stage.name[locale]),
+          literal(stage.description[locale]),
+        ]),
+      ),
+    ),
+  ),
+  "on conflict (disease_stage_id, locale) do nothing;",
+);
+
+output.push(
+  "",
+  "insert into public.references (id, title, authors, publisher, edition, publication_year, doi, pmid, url, reference_type, status) values",
+  rows(
+    scientificReferences.map((reference) => [
+      literal(reference.id),
+      literal(reference.title),
+      textArray(reference.authors),
+      literal(reference.publisher),
+      literal(reference.edition),
+      literal(reference.year),
+      literal(reference.doi),
+      literal(reference.pubmedId),
+      literal(reference.url),
+      literal(reference.category),
+      literal("published"),
+    ]),
+  ),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.structure_references (structure_id, reference_id, section_key) values",
+  rows(
+    heartStructures.flatMap((structure) =>
+      structure.referenceIds.map((referenceId) => [
+        literal(structure.id),
+        literal(referenceId),
+        literal("general"),
+      ]),
+    ),
+  ),
+  "on conflict (structure_id, reference_id, section_key) do nothing;",
+  "",
+  "insert into public.disease_references (disease_id, reference_id, section_key) values",
+  rows(
+    heartDiseases.flatMap((disease) =>
+      disease.referenceIds.map((referenceId) => [
+        literal(disease.id),
+        literal(referenceId),
+        literal("general"),
+      ]),
+    ),
+  ),
+  "on conflict (disease_id, reference_id, section_key) do nothing;",
+  "",
+  "insert into public.physiology_references (physiology_topic_id, reference_id, section_key) values",
+  rows(
+    physiologyTopics.flatMap((topic) =>
+      ["REF_GUYTON_HALL", "REF_GRAYS_ANATOMY"].map((referenceId) => [
+        literal(topic.id),
+        literal(referenceId),
+        literal("general"),
+      ]),
+    ),
+  ),
+  "on conflict (physiology_topic_id, reference_id, section_key) do nothing;",
+);
+
+const assetUuid = "00000000-0000-4000-8000-000000000101";
+const proceduralAsset = modelAssets[0];
+output.push(
+  "",
+  "insert into public.three_d_assets (id, system_id, root_structure_id, name, asset_type, format, version, license, attribution, status, metadata) values",
+  rows([
+    [
+      literal(assetUuid),
+      literal(proceduralAsset.systemId),
+      literal(proceduralAsset.rootStructureId),
+      literal("Procedural cardiovascular heart"),
+      literal("procedural"),
+      literal("procedural"),
+      literal("1.0.0"),
+      literal(proceduralAsset.license),
+      literal(proceduralAsset.attribution.en),
+      literal("published"),
+      json({ legacyId: proceduralAsset.id, attribution: proceduralAsset.attribution }),
+    ],
+  ]),
+  "on conflict (id) do nothing;",
+  "",
+  "insert into public.mesh_mappings (asset_id, mesh_name, structure_id) values",
+  rows(
+    heartStructures.flatMap((structure) =>
+      structure.meshIds.map((meshName) => [literal(assetUuid), literal(meshName), literal(structure.id)]),
+    ),
+  ),
+  "on conflict (asset_id, mesh_name) do nothing;",
+  "commit;",
+  "",
+);
+
+process.stdout.write(output.join("\n"));

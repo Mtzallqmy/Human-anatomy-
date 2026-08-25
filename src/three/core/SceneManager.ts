@@ -43,6 +43,7 @@ export class SceneManager {
   private readonly timer = new THREE.Timer();
   private readonly container: HTMLElement;
   private model: THREE.Group | null = null;
+  private rootStructureId: string | null = null;
   private animationFrame = 0;
 
   constructor(options: SceneOptions) {
@@ -61,7 +62,7 @@ export class SceneManager {
     this.renderer.setSize(width, height, false);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.15;
+    this.renderer.toneMappingExposure = 1.28;
     this.cameraManager = new CameraManager(canvas, width, height);
     this.registry = new MeshRegistry(meshMapping);
     this.pathology = new PathologyVisualizer(this.registry);
@@ -73,9 +74,10 @@ export class SceneManager {
       onSelect,
     );
     this.labels = new LabelManager(labelLayer, this.cameraManager.camera, structures, onSelect);
-    this.scene.add(new THREE.AmbientLight("#d8e1ea", 1.2));
+    this.scene.add(new THREE.HemisphereLight("#e7f2fb", "#361f25", 1.55));
+    this.scene.add(new THREE.AmbientLight("#d8e1ea", 1.35));
     const key = new THREE.DirectionalLight("#ffe4d8", 3.1);
-    key.position.set(4, 6, 6);
+    key.position.set(4, 6, 7);
     this.scene.add(key);
     const rim = new THREE.DirectionalLight("#83a9cf", 2.2);
     rim.position.set(-5, 1, -3);
@@ -95,21 +97,31 @@ export class SceneManager {
       disposeObject(this.model);
     }
     this.model = await new ModelLoader().load(asset);
+    this.rootStructureId = asset.rootStructureId;
     this.scene.add(this.model);
   }
 
   select(structureId: string, focus = true) {
     if (!this.model) return;
+    if (structureId === this.rootStructureId) {
+      this.highlighter.clear();
+      this.model.traverse((object) => {
+        if (object instanceof THREE.Mesh) object.visible = true;
+      });
+      if (focus) this.cameraManager.focus([this.model]);
+      return;
+    }
     const objects = this.registry.getObjectsForStructure(this.model, structureId);
     this.highlighter.select(objects);
     if (focus && objects.length > 0) this.cameraManager.focus(objects);
-    if (structureId === "ANAT_HEART" && focus) this.cameraManager.reset();
   }
 
   setVisibility(hiddenStructureIds: string[], isolatedStructureId: string | null) {
     if (!this.model) return;
-    const wholeOrganHidden = hiddenStructureIds.includes("ANAT_HEART");
-    const wholeOrganIsolated = isolatedStructureId === "ANAT_HEART";
+    const wholeOrganHidden = Boolean(
+      this.rootStructureId && hiddenStructureIds.includes(this.rootStructureId),
+    );
+    const wholeOrganIsolated = isolatedStructureId === this.rootStructureId;
     this.model.traverse((object) => {
       if (!(object instanceof THREE.Mesh)) return;
       const structureId = this.registry.getStructureId(object);

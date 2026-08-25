@@ -8,7 +8,7 @@ import { PathologyPanel } from "@/src/components/panels/PathologyPanel";
 import { PhysiologyPanel } from "@/src/components/panels/PhysiologyPanel";
 import { ReferencesPanel } from "@/src/components/panels/ReferencesPanel";
 import { useLocale } from "@/src/hooks/useLocale";
-import { medicalRepository } from "@/src/services/medicalRepository";
+import { useContentStore } from "@/src/store/contentStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
 
@@ -18,7 +18,7 @@ export function StructureInfoPanel() {
   const tab = useUIStore((state) => state.activeMedicalTab);
   const panelOpen = useUIStore((state) => state.informationPanelOpen);
   const setPanelOpen = useUIStore((state) => state.setInformationPanelOpen);
-  const structure = medicalRepository.getStructureById(structureId);
+  const structure = useContentStore((state) => state.structures.find((item) => item.id === structureId));
 
   if (!structure)
     return (

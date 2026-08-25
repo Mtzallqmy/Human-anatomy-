@@ -8,8 +8,8 @@ export class HighlightManager {
     for (const object of objects) {
       object.traverse((child) => {
         if (!(child instanceof THREE.Mesh) || !(child.material instanceof THREE.MeshPhysicalMaterial)) return;
-        child.material.emissive.set("#bc746b");
-        child.material.emissiveIntensity = 0.28;
+        child.material.emissive.set("#f08d81");
+        child.material.emissiveIntensity = 0.48;
         this.highlighted.push(child);
       });
     }

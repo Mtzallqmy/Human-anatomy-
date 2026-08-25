@@ -34,7 +34,12 @@ export const useViewerStore = create<ViewerState>((set) => ({
   qualityMode: "high",
   bloodFlowEnabled: false,
   resetRequest: 0,
-  setSelectedStructure: (selectedStructureId) => set({ selectedStructureId }),
+  setSelectedStructure: (selectedStructureId) =>
+    set((state) => ({
+      selectedStructureId,
+      hiddenStructureIds: state.hiddenStructureIds.filter((item) => item !== selectedStructureId),
+      isolatedStructureId: null,
+    })),
   setSelectedSystem: (selectedSystemId) => set({ selectedSystemId }),
   hideStructure: (id) =>
     set((state) => ({ hiddenStructureIds: [...new Set([...state.hiddenStructureIds, id])] })),

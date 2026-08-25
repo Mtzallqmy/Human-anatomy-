@@ -17,10 +17,10 @@ const tissueColors: Record<TissueKind, string> = {
 export function createTissueMaterial(kind: TissueKind): THREE.MeshPhysicalMaterial {
   const material = new THREE.MeshPhysicalMaterial({
     color: tissueColors[kind],
-    roughness: kind === "valve" ? 0.45 : 0.64,
+    roughness: kind === "valve" ? 0.38 : 0.54,
     metalness: 0.04,
-    clearcoat: 0.16,
-    clearcoatRoughness: 0.48,
+    clearcoat: 0.24,
+    clearcoatRoughness: 0.4,
     transparent: kind === "septum",
     opacity: kind === "septum" ? 0.72 : 1,
     side: THREE.DoubleSide,

@@ -21,12 +21,20 @@ export class PathologyVisualizer {
       const structureId = this.registry.getStructureId(object);
       if (!disease || !structureId || !disease.affectedStructureIds.includes(structureId) || showHealthy)
         return;
-      const color = disease.stages.find((stage) => stage.visualState?.color)?.visualState?.color ?? "#dca26f";
+      const diseaseStages = disease.stages.filter((stage) => stage.order > 0);
+      const stageIndex = Math.min(
+        diseaseStages.length - 1,
+        Math.max(0, Math.ceil(progress * diseaseStages.length) - 1),
+      );
+      const visualState = diseaseStages[stageIndex]?.visualState;
+      const color = visualState?.color ?? "#dca26f";
       object.material.color.lerp(new THREE.Color(color), progress * 0.72);
       object.material.emissive.set(color);
       object.material.emissiveIntensity = progress * 0.19;
-      if (disease.id === "DIS_CARDIAC_HYPERTROPHY") object.scale.multiplyScalar(1 + progress * 0.13);
-      const target = object.morphTargetDictionary?.diseaseSeverity;
+      if (visualState?.scaleMultiplier)
+        object.scale.multiplyScalar(1 + progress * visualState.scaleMultiplier);
+      const targetName = visualState?.morphTarget;
+      const target = targetName ? object.morphTargetDictionary?.[targetName] : undefined;
       if (typeof target === "number" && object.morphTargetInfluences)
         object.morphTargetInfluences[target] = progress;
     });

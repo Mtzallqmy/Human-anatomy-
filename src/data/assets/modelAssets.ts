@@ -6,6 +6,7 @@ export const modelAssets: ModelAsset[] = [
     id: "MODEL_PROCEDURAL_HEART",
     url: null,
     systemId: "SYS_CARDIOVASCULAR",
+    rootStructureId: "ANAT_HEART",
     structureIds: heartStructures.map((structure) => structure.id),
     format: "procedural",
     attribution: {

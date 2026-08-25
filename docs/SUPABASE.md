@@ -1,6 +1,6 @@
-# Supabase integration boundary
+# Supabase integration
 
-Supabase is deliberately optional during the MVP. `src/services/supabaseClient.ts` creates a browser client only when both public variables exist.
+Supabase is the primary published-content, authentication, workflow, and asset backend. `src/lib/supabase/client.ts` creates one typed browser client when both public variables exist. Public atlas screens retain a local read-only fallback so a temporary network failure does not break the 3D experience.
 
 ## Safe variables
 
@@ -11,13 +11,13 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 The publishable key is intended for public clients and must be protected by Row Level Security. Never put `service_role`, a secret key, or a database password in a `NEXT_PUBLIC_` variable.
 
-## Planned repository transition
+## Implemented data path
 
-1. Define the reviewed content schema in migrations.
-2. Enable RLS on every exposed table before granting API access.
-3. Add read policies only for records marked as published.
-4. Generate TypeScript database types.
-5. Implement a Supabase repository with the current `medicalRepository` behavior.
-6. Switch repositories in the provider layer, without coupling components to database rows.
+1. Timestamped migrations define the schema, indexes, RLS, search, audit triggers, and Storage policies.
+2. `supabase/seed.sql` imports the cardiovascular MVP using stable IDs.
+3. Generated types live in `src/types/database.ts`.
+4. `supabaseMedicalRepository` loads and validates public system bundles.
+5. `adminRepository` performs editorial changes under the signed-in user's RLS role.
+6. TanStack Query caches reads and invalidates changed admin catalogs.
 
-The application does not write medical content from the browser in this phase.
+The application writes medical content only for authenticated, active staff. PostgreSQL policies—not UI controls—authorize every operation.
