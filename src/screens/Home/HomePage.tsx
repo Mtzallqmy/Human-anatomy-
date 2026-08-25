@@ -2,16 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUpRight,
-  BookOpen,
-  HeartPulse,
-  Layers3,
-  ScanLine,
-  Waves,
-} from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, Layers3, ScanLine, Waves } from "lucide-react";
 import { gsap } from "gsap";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
 import { useLocale } from "@/src/hooks/useLocale";
@@ -78,22 +69,22 @@ export function HomePage() {
             </Link>
           </div>
           <Link
-            href="/systems/cardiovascular"
+            href="/atlas/human-body"
             className="featured-module"
             data-hero-reveal
-            aria-label={t("home.heart")}
+            aria-label={t("home.humanBody")}
           >
             <div className="featured-module-top">
               <span>{t("home.featured")}</span>
               <ArrowUpRight size={18} />
             </div>
             <div className="featured-heart-symbol">
-              <HeartPulse size={112} strokeWidth={0.8} aria-hidden="true" />
+              <ScanLine size={112} strokeWidth={0.8} aria-hidden="true" />
             </div>
             <div className="featured-module-bottom">
-              <span className="module-kicker">{t("home.cardiovascular")}</span>
-              <strong>{t("home.heart")}</strong>
-              <p>{t("home.moduleDescription")}</p>
+              <span className="module-kicker">{t("home.multiSystem")}</span>
+              <strong>{t("home.humanBody")}</strong>
+              <p>{t("home.multiSystemDescription")}</p>
             </div>
           </Link>
           <div className="hero-scroll" data-hero-reveal>

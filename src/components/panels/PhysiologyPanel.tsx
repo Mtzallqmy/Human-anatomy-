@@ -2,6 +2,7 @@
 
 import { Pause, Play } from "lucide-react";
 import { bloodFlowSteps } from "@/src/data/physiology/bloodFlow";
+import { physiologyAnimations } from "@/src/data/anatomy/humanBodyCatalog";
 import { useLocale } from "@/src/hooks/useLocale";
 import { useViewerStore } from "@/src/store/viewerStore";
 import type { AnatomicalStructure } from "@/src/types/medical";
@@ -12,6 +13,16 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
   const setBloodFlowEnabled = useViewerStore((state) => state.setBloodFlowEnabled);
   const selectStructure = useViewerStore((state) => state.setSelectedStructure);
   const selectedStructureId = useViewerStore((state) => state.selectedStructureId);
+  const animation = physiologyAnimations.find((item) => item.systemId === structure.systemId);
+  const pathway =
+    structure.systemId === "SYS_CARDIOVASCULAR"
+      ? bloodFlowSteps.map((step, index) => ({ ...step, id: `${step.structureId}-${index}` }))
+      : (animation?.steps ?? []).map((step) => ({
+          id: step.id,
+          structureId: step.structureId,
+          name: step.name,
+          oxygenation: "oxygenated" as const,
+        }));
 
   return (
     <div className="medical-content">
@@ -20,29 +31,35 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
         <p>{localize(structure.physiology)}</p>
       </section>
       <section className="content-section">
-        <h3>{t("medical.bloodFlow")}</h3>
-        <p>{t("medical.bloodFlowDescription")}</p>
+        <h3>{animation ? localize(animation.name) : t("medical.bloodFlow")}</h3>
+        <p>
+          {structure.systemId === "SYS_CARDIOVASCULAR"
+            ? t("medical.bloodFlowDescription")
+            : t("medical.systemPathwayDescription")}
+        </p>
         <button
           type="button"
           className={bloodFlowEnabled ? "flow-toggle flow-toggle--active" : "flow-toggle"}
           onClick={() => setBloodFlowEnabled(!bloodFlowEnabled)}
         >
           {bloodFlowEnabled ? <Pause size={14} /> : <Play size={14} />}
-          {t(bloodFlowEnabled ? "medical.disableFlow" : "medical.enableFlow")}
+          {t(bloodFlowEnabled ? "medical.disableFlow" : "medical.enablePathway")}
         </button>
-        <div className="flow-legend">
-          <span>
-            <i className="flow-dot flow-dot--venous" />
-            {t("medical.deoxygenated")}
-          </span>
-          <span>
-            <i className="flow-dot flow-dot--arterial" />
-            {t("medical.oxygenated")}
-          </span>
-        </div>
+        {structure.systemId === "SYS_CARDIOVASCULAR" && (
+          <div className="flow-legend">
+            <span>
+              <i className="flow-dot flow-dot--venous" />
+              {t("medical.deoxygenated")}
+            </span>
+            <span>
+              <i className="flow-dot flow-dot--arterial" />
+              {t("medical.oxygenated")}
+            </span>
+          </div>
+        )}
         <ol className="flow-steps">
-          {bloodFlowSteps.map((step, index) => (
-            <li key={`${step.structureId}-${index}`}>
+          {pathway.map((step, index) => (
+            <li key={step.id}>
               <button
                 type="button"
                 className={selectedStructureId === step.structureId ? "flow-step--active" : ""}
@@ -58,10 +75,12 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
           ))}
         </ol>
       </section>
-      <section className="content-section">
-        <h3>{t("medical.cardiacCycle")}</h3>
-        <p>{t("medical.cardiacCycleDescription")}</p>
-      </section>
+      {structure.systemId === "SYS_CARDIOVASCULAR" && (
+        <section className="content-section">
+          <h3>{t("medical.cardiacCycle")}</h3>
+          <p>{t("medical.cardiacCycleDescription")}</p>
+        </section>
+      )}
     </div>
   );
 }

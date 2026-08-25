@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight, MapPin } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useLocale } from "@/src/hooks/useLocale";
 import { medicalRepository } from "@/src/services/medicalRepository";
 import { useViewerStore } from "@/src/store/viewerStore";
@@ -9,6 +10,13 @@ import type { AnatomicalStructure } from "@/src/types/medical";
 export function AnatomyPanel({ structure }: { structure: AnatomicalStructure }) {
   const { t, localize } = useLocale();
   const setSelectedStructure = useViewerStore((state) => state.setSelectedStructure);
+  const setSelectedSystem = useViewerStore((state) => state.setSelectedSystem);
+  const router = useRouter();
+  const openStructure = (item: AnatomicalStructure) => {
+    setSelectedSystem(item.systemId, item.id);
+    setSelectedStructure(item.id);
+    router.push(`/atlas/structure/${item.id}`);
+  };
   const related = structure.relatedStructureIds
     .map((id) => medicalRepository.getStructureById(id))
     .filter((item): item is AnatomicalStructure => Boolean(item));
@@ -47,7 +55,7 @@ export function AnatomyPanel({ structure }: { structure: AnatomicalStructure }) 
           <h3>{t("medical.components")}</h3>
           <div className="related-list">
             {components.map((item) => (
-              <button key={item.id} type="button" onClick={() => setSelectedStructure(item.id)}>
+              <button key={item.id} type="button" onClick={() => openStructure(item)}>
                 {localize(item.name)}
                 <ArrowUpRight size={13} />
               </button>
@@ -60,7 +68,7 @@ export function AnatomyPanel({ structure }: { structure: AnatomicalStructure }) 
           <h3>{t("medical.related")}</h3>
           <div className="related-list">
             {related.map((item) => (
-              <button key={item.id} type="button" onClick={() => setSelectedStructure(item.id)}>
+              <button key={item.id} type="button" onClick={() => openStructure(item)}>
                 {localize(item.name)}
                 <ArrowUpRight size={13} />
               </button>

@@ -9,6 +9,9 @@ flowchart TD
   DAL --> API[Supabase Data API]
   API --> DB[PostgreSQL with RLS]
   UI --> Engine[Three.js engine]
+  UI --> Imaging[Lazy 2D imaging viewer]
+  Imaging --> Shared[Shared structure selection]
+  Shared --> Engine
   Engine --> Assets[Supabase Storage or procedural asset]
   Engine --> Registry[Mesh registry]
   Registry --> DB
@@ -18,7 +21,7 @@ Dependencies flow toward stable domain IDs. Medical content does not depend on a
 
 ## Public content path
 
-MedicalContentBootstrap loads the selected system only. supabaseMedicalRepository validates critical responses with Zod, builds the existing domain objects, and requests short-lived signed URLs for private published assets. TanStack Query caches system and bundle responses. contentStore hydrates public components without exposing Supabase calls throughout the UI. If the API fails, the viewer stays usable with the typed local cardiovascular fallback and a visible warning.
+MedicalContentBootstrap loads the selected system only. supabaseMedicalRepository validates critical responses with Zod, builds domain objects, and requests short-lived signed URLs for private published assets. TanStack Query caches system and bundle responses. The fallback covers every Stage 4 system. Imaging metadata loads only on imaging routes or tabs.
 
 ## Editorial path
 
@@ -31,6 +34,7 @@ Core updates trigger immutable JSON snapshots in content_versions and records in
 - SceneManager: lifecycle and orchestration
 - CameraManager: orbit, resize, reset, and GSAP focus
 - ModelLoader: procedural and lazy GLB/GLTF loading; Draco/Meshopt extension points
+- AssetCacheManager: reusable loaded-asset cache with cloned geometry and materials
 - MeshRegistry: external mesh-name to anatomical-ID mapping
 - SelectionManager and HighlightManager: raycasting and selected state
 - LabelManager: simple and numbered study labels
@@ -39,6 +43,8 @@ Core updates trigger immutable JSON snapshots in content_versions and records in
 - disposeObject: geometry, material, and texture cleanup
 
 The atlas dynamically imports the viewer so public editorial pages do not pay the Three.js cost.
+
+Full-body mode uses a simplified layered asset. `SceneManager.setSystemLayers` applies visibility and opacity by system metadata; detailed organ assets remain independently lazy-loaded.
 
 ## Extension contract
 

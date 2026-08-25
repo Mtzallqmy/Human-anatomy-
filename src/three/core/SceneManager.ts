@@ -42,6 +42,7 @@ export class SceneManager {
   private readonly resizeObserver: ResizeObserver;
   private readonly timer = new THREE.Timer();
   private readonly container: HTMLElement;
+  private readonly structures: AnatomicalStructure[];
   private model: THREE.Group | null = null;
   private rootStructureId: string | null = null;
   private animationFrame = 0;
@@ -49,6 +50,7 @@ export class SceneManager {
   constructor(options: SceneOptions) {
     const { canvas, context, container, labelLayer, meshMapping, structures, onSelect } = options;
     this.container = container;
+    this.structures = structures;
     const width = container.clientWidth || 700;
     const height = container.clientHeight || 600;
     this.renderer = new THREE.WebGLRenderer({
@@ -96,9 +98,19 @@ export class SceneManager {
       this.scene.remove(this.model);
       disposeObject(this.model);
     }
-    this.model = await new ModelLoader().load(asset);
+    this.model = await new ModelLoader().load(asset, this.structures);
     this.rootStructureId = asset.rootStructureId;
     this.scene.add(this.model);
+    this.model.updateMatrixWorld(true);
+    const targets: THREE.Mesh[] = [];
+    const points: THREE.Vector3[] = [];
+    for (const structure of this.structures.filter((item) => item.id !== asset.rootStructureId)) {
+      const object = this.registry.getObjectsForStructure(this.model, structure.id)[0];
+      if (!(object instanceof THREE.Mesh)) continue;
+      points.push(new THREE.Box3().setFromObject(object).getCenter(new THREE.Vector3()));
+      if (/LUNG/.test(structure.id)) targets.push(object);
+    }
+    this.animator.configure(asset.systemId, points.slice(0, 10), targets);
   }
 
   select(structureId: string, focus = true) {
@@ -146,6 +158,37 @@ export class SceneManager {
       object.material.needsUpdate = true;
     });
   }
+  setSectionMode(enabled: boolean) {
+    if (!this.model) return;
+    this.renderer.localClippingEnabled = enabled;
+    const plane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+    this.model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const item of materials) {
+        item.clippingPlanes = enabled ? [plane] : null;
+        item.clipShadows = enabled;
+        item.needsUpdate = true;
+      }
+    });
+  }
+  setExplodedView(enabled: boolean) {
+    if (!this.model) return;
+    const center = new THREE.Box3().setFromObject(this.model).getCenter(new THREE.Vector3());
+    this.model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      if (!(object.userData.originalPosition instanceof THREE.Vector3))
+        object.userData.originalPosition = object.position.clone();
+      const original = object.userData.originalPosition as THREE.Vector3;
+      if (!enabled) {
+        object.position.copy(original);
+        return;
+      }
+      const direction = original.clone().sub(center).normalize();
+      if (direction.lengthSq() < 0.001) direction.set(0, 0, 1);
+      object.position.copy(original).add(direction.multiplyScalar(0.22));
+    });
+  }
 
   setLabels(mode: LabelMode, locale: Locale) {
     this.labels.setMode(mode, locale);
@@ -161,6 +204,25 @@ export class SceneManager {
   }
   setQuality(mode: QualityMode) {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ratios[mode]));
+  }
+  setSystemLayers(visibleSystemIds: string[], opacityBySystem: Record<string, number>) {
+    if (!this.model) return;
+    this.model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const systemId = object.userData.systemId as string | undefined;
+      if (!systemId) return;
+      object.visible = visibleSystemIds.includes(systemId);
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const item of materials) {
+        if (!(item instanceof THREE.MeshPhysicalMaterial)) continue;
+        const base = Number(item.userData.originalOpacity ?? 1);
+        const opacity = Math.min(base, opacityBySystem[systemId] ?? base);
+        item.opacity = opacity;
+        item.transparent = opacity < 1;
+        item.depthWrite = opacity > 0.25;
+        item.needsUpdate = true;
+      }
+    });
   }
   resetCamera() {
     this.cameraManager.reset();

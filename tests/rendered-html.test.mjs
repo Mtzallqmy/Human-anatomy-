@@ -41,6 +41,9 @@ for (const route of [
   "/references",
   "/admin/login",
   "/admin",
+  "/atlas/respiratory",
+  "/imaging/IMG_CHEST_CT_EDU",
+  "/admin/imaging",
 ]) {
   test(`renders ${route}`, async () => {
     const response = await render(route);

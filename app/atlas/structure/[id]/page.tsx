@@ -20,5 +20,6 @@ export async function generateMetadata({ params }: StructureRouteProps): Promise
 
 export default async function Page({ params }: StructureRouteProps) {
   const { id } = await params;
-  return <AtlasPage initialStructureId={id} />;
+  const structure = medicalRepository.getStructureById(id);
+  return <AtlasPage initialStructureId={id} initialSystemId={structure?.systemId} />;
 }

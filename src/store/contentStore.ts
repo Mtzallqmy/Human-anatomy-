@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { heartStructures } from "@/src/data/anatomy/heartStructures";
+import { allHumanStructures, expandedDiseases } from "@/src/data/anatomy/humanBodyCatalog";
 import { meshRegistry, modelAssets } from "@/src/data/assets/modelAssets";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
 import { scientificReferences } from "@/src/data/references/references";
@@ -41,8 +41,8 @@ interface ContentState {
 export const useContentStore = create<ContentState>((set) => ({
   searchQuery: "",
   systems: bodySystems,
-  structures: heartStructures,
-  diseases: heartDiseases,
+  structures: allHumanStructures,
+  diseases: [...heartDiseases, ...expandedDiseases],
   references: scientificReferences,
   assets: modelAssets,
   meshRegistry: { ...meshRegistry },
@@ -56,8 +56,8 @@ export const useContentStore = create<ContentState>((set) => ({
   useFallback: (error) =>
     set({
       systems: bodySystems,
-      structures: heartStructures,
-      diseases: heartDiseases,
+      structures: allHumanStructures,
+      diseases: [...heartDiseases, ...expandedDiseases],
       references: scientificReferences,
       assets: modelAssets,
       meshRegistry: { ...meshRegistry },

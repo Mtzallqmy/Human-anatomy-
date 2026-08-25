@@ -1,6 +1,6 @@
 # Human Anatomy, Physiology & Pathology Atlas
 
-A bilingual Arabic/English medical education platform that connects anatomy, physiology, pathology, interactive 3D visualization, and traceable references. The cardiovascular module is the first reusable module of a larger human-body atlas.
+A bilingual Arabic/English medical education platform connecting anatomy, physiology, pathology, interactive 3D visualization, medical imaging, and traceable references across multiple body systems.
 
 ## Delivered scope
 
@@ -11,6 +11,10 @@ A bilingual Arabic/English medical education platform that connects anatomy, phy
 - Supabase Auth with pending staff requests and editor, reviewer, and admin roles
 - Guarded /admin CMS for systems, structures, diseases, physiology, references, assets, mesh mappings, review, publishing, and staff access
 - TanStack Query data access with Zod validation, system-scoped loading, signed asset URLs, and local fallback
+- Full-body layer mode plus cardiovascular, respiratory, digestive, urinary, nervous, and musculoskeletal modules
+- Reusable procedural system models, hierarchical structure tree, cross-system links, generic physiology paths, and asset caching
+- Educational CT, MRI, X-ray, histology, and pathology imaging with slices, normalized annotations, shared 3D selection, and split view
+- Imaging CMS, licensing gates, EXIF-removing normalization, batch limits, coverage metrics, and an annotation editor
 
 The procedural heart is an original educational abstraction. It validates the interaction architecture but is not a clinically validated anatomical asset.
 
@@ -57,6 +61,7 @@ src/app/                     Providers
 src/components/              Reusable viewer, medical, and navigation UI
 src/features/auth/           Supabase session and route guards
 src/features/admin/          CMS forms, catalogs, workflow, assets, users
+src/features/imaging/        Lazy medical imaging viewer and generated educational visuals
 src/data-access/             Validated public and editorial repositories
 src/three/                   Framework-independent viewer engine
 src/store/                   Focused Zustand state
@@ -64,6 +69,7 @@ src/data/                    Typed offline fallback and seed source
 src/i18n/                    Arabic and English UI resources
 supabase/migrations/         Versioned PostgreSQL schema and policies
 supabase/seed.sql            Reproducible cardiovascular seed
+supabase/seed-stage4-5.sql   Generated multi-system and imaging seed
 docs/                        Architecture, database, CMS, and workflow guides
 ```
 
@@ -85,6 +91,8 @@ The public viewer resolves mesh name → mesh_mappings → anatomical structure 
 ## Database setup
 
 Apply migrations in timestamp order, then run supabase/seed.sql. See [Database](docs/DATABASE.md), [Admin](docs/ADMIN.md), [Content workflow](docs/CONTENT_WORKFLOW.md), and [Architecture](docs/ARCHITECTURE.md).
+
+Regenerate the multi-system and imaging seed with `npm run db:seed:stage4-5`. Imaging modules use project-owned generated illustrations, not patient scans or unlicensed internet assets.
 
 ## Deployment
 

@@ -10,6 +10,8 @@ import { MedicalContentBootstrap } from "@/src/features/anatomy/MedicalContentBo
 import { useContentStore } from "@/src/store/contentStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
+import { AppErrorBoundary } from "@/src/components/ui/AppErrorBoundary";
+import { useLocale } from "@/src/hooks/useLocale";
 
 const AtlasViewer = dynamic(
   () => import("@/src/components/medical/AtlasViewer").then((module) => module.AtlasViewer),
@@ -19,17 +21,39 @@ const AtlasViewer = dynamic(
   },
 );
 
-export function AtlasPage({ initialStructureId }: { initialStructureId?: string }) {
+export function AtlasPage({
+  initialStructureId,
+  initialSystemId,
+}: {
+  initialStructureId?: string;
+  initialSystemId?: string;
+}) {
   const setSelectedStructure = useViewerStore((state) => state.setSelectedStructure);
+  const setSelectedSystem = useViewerStore((state) => state.setSelectedSystem);
   const setPanelOpen = useUIStore((state) => state.setInformationPanelOpen);
   const structures = useContentStore((state) => state.structures);
+  const { t } = useLocale();
 
   useEffect(() => {
-    if (initialStructureId && structures.some((structure) => structure.id === initialStructureId)) {
-      setSelectedStructure(initialStructureId);
+    const structure = initialStructureId
+      ? structures.find((item) => item.id === initialStructureId)
+      : undefined;
+    if (structure) {
+      setSelectedSystem(structure.systemId, structure.id);
+      setSelectedStructure(structure.id);
       setPanelOpen(true);
+    } else if (initialSystemId) {
+      const root = structures.find((item) => item.systemId === initialSystemId && !item.parentId);
+      setSelectedSystem(initialSystemId, root?.id);
     }
-  }, [initialStructureId, setPanelOpen, setSelectedStructure, structures]);
+  }, [
+    initialStructureId,
+    initialSystemId,
+    setPanelOpen,
+    setSelectedStructure,
+    setSelectedSystem,
+    structures,
+  ]);
 
   return (
     <div className="atlas-page">
@@ -38,7 +62,13 @@ export function AtlasPage({ initialStructureId }: { initialStructureId?: string 
       <main className="atlas-layout">
         <SystemSidebar />
         <section className="viewer-region">
-          <AtlasViewer />
+          <AppErrorBoundary
+            title={t("common.error")}
+            message={t("atlas.modelError")}
+            retryLabel={t("common.retry")}
+          >
+            <AtlasViewer />
+          </AppErrorBoundary>
           <ViewerToolbar />
         </section>
         <StructureInfoPanel />

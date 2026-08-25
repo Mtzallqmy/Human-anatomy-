@@ -11,6 +11,8 @@ export const localizedTranslationSchema = z.object({
 export const systemMetadataSchema = z.object({
   icon: z.string().default("circle"),
   accentColor: z.string().default("#718394"),
+  rootStructureIds: z.array(z.string()).default([]),
+  organIds: z.array(z.string()).default([]),
 });
 
 export const structureMetadataSchema = z.object({
@@ -134,7 +136,7 @@ export const assetRowsSchema = z.array(
 export const searchRowsSchema = z.array(
   z.object({
     id: z.string(),
-    result_type: z.enum(["system", "structure", "disease"]),
+    result_type: z.enum(["system", "structure", "disease", "physiology", "imaging"]),
     system_id: z.string().nullable(),
     name_en: z.string(),
     name_ar: z.string(),

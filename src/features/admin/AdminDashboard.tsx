@@ -10,6 +10,7 @@ const cards = [
   ["physiology_topics", "Physiology topics", "/admin/physiology"],
   ["references", "References", "/admin/references"],
   ["three_d_assets", "3D assets", "/admin/assets"],
+  ["imaging_studies", "Imaging studies", "/admin/imaging"],
   ["waiting", "Waiting for review", "/admin/review"],
 ] as const;
 

@@ -1,87 +1,86 @@
 import * as THREE from "three";
+import { disposeObject } from "@/src/three/utils/disposeObject";
 
 interface FlowParticle {
   mesh: THREE.Mesh;
   curve: THREE.CatmullRomCurve3;
   offset: number;
   speed: number;
-  pulseOffset: number;
 }
+
+const colors: Record<string, string> = {
+  SYS_CARDIOVASCULAR: "#ff8174",
+  SYS_RESPIRATORY: "#70d6eb",
+  SYS_DIGESTIVE: "#f4b06a",
+  SYS_URINARY: "#b8a2ff",
+  SYS_NERVOUS: "#ffd67a",
+  SYS_MUSCULOSKELETAL: "#ff9c85",
+};
 
 export class PhysiologyAnimator {
   readonly group = new THREE.Group();
-  private readonly particles: FlowParticle[] = [];
+  private particles: FlowParticle[] = [];
+  private targets: THREE.Mesh[] = [];
+  private systemId = "SYS_CARDIOVASCULAR";
   private elapsed = 0;
 
   constructor() {
-    this.group.name = "Blood_Flow_Visualization";
+    this.group.name = "Physiology_Pathway_Visualization";
     this.group.visible = false;
-    const venous = new THREE.CatmullRomCurve3(
-      [
-        [1.08, 2, 0],
-        [1.03, 1.1, 0.17],
-        [0.81, 0.59, 0.32],
-        [0.55, 0.14, 0.63],
-        [0.36, -0.43, 0.56],
-        [0.1, 0.31, 0.67],
-        [0.2, 0.99, 0.74],
-        [0.66, 1.57, 0.33],
-      ].map(([x, y, z]) => new THREE.Vector3(x, y - 0.2, z)),
-    );
-    const arterial = new THREE.CatmullRomCurve3(
-      [
-        [-0.72, 1.01, 0.12],
-        [-0.48, 0.62, 0.42],
-        [-0.43, 0.15, 0.73],
-        [-0.46, -0.54, 0.67],
-        [-0.23, 0.09, 0.65],
-        [-0.23, 0.8, 0.46],
-        [-0.3, 1.43, 0.13],
-        [-0.54, 1.97, -0.02],
-        [-0.98, 1.97, -0.15],
-      ].map(([x, y, z]) => new THREE.Vector3(x, y - 0.2, z)),
-    );
-    this.createStream(venous, "#67b5ff", 18);
-    this.createStream(arterial, "#ff8174", 18);
+  }
+
+  configure(systemId: string, points: THREE.Vector3[], targets: THREE.Mesh[] = []) {
+    for (const child of [...this.group.children]) {
+      this.group.remove(child);
+      disposeObject(child);
+    }
+    this.particles = [];
+    this.targets = targets;
+    this.systemId = systemId;
+    this.elapsed = 0;
+    if (points.length < 2) return;
+    const curve = new THREE.CatmullRomCurve3(points, false, "centripetal");
+    this.createStream(curve, colors[systemId] ?? "#7ed7dc", 20);
   }
 
   private createStream(curve: THREE.CatmullRomCurve3, color: string, count: number) {
     const path = new THREE.Mesh(
-      new THREE.TubeGeometry(curve, 96, 0.018, 8, false),
+      new THREE.TubeGeometry(curve, 96, 0.02, 8, false),
       new THREE.MeshBasicMaterial({
         color,
         transparent: true,
-        opacity: 0.42,
+        opacity: 0.5,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
       }),
     );
     path.renderOrder = 4;
     this.group.add(path);
-    const geometry = new THREE.SphereGeometry(0.061, 14, 12);
     for (let index = 0; index < count; index += 1) {
-      const material = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 0.98,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      });
-      const mesh = new THREE.Mesh(geometry.clone(), material);
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.055, 12, 10),
+        new THREE.MeshBasicMaterial({
+          color,
+          transparent: true,
+          opacity: 0.98,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        }),
+      );
       mesh.renderOrder = 5;
       this.group.add(mesh);
-      this.particles.push({
-        mesh,
-        curve,
-        offset: index / count,
-        speed: 0.105,
-        pulseOffset: (index / count) * Math.PI * 2,
-      });
+      this.particles.push({ mesh, curve, offset: index / count, speed: 0.1 });
     }
   }
 
   setEnabled(enabled: boolean) {
     this.group.visible = enabled;
+    if (!enabled) {
+      for (const target of this.targets) {
+        if (target.userData.physiologyScale instanceof THREE.Vector3)
+          target.scale.copy(target.userData.physiologyScale as THREE.Vector3);
+      }
+    }
   }
 
   update(delta: number) {
@@ -91,8 +90,15 @@ export class PhysiologyAnimator {
       particle.mesh.position.copy(
         particle.curve.getPointAt((particle.offset + this.elapsed * particle.speed) % 1),
       );
-      const pulse = 0.82 + Math.sin(this.elapsed * 4.2 + particle.pulseOffset) * 0.2;
-      particle.mesh.scale.setScalar(pulse);
+      particle.mesh.scale.setScalar(0.82 + Math.sin(this.elapsed * 4 + particle.offset * 8) * 0.18);
+    }
+    if (this.systemId === "SYS_RESPIRATORY") {
+      const breath = 1 + Math.sin(this.elapsed * 1.6) * 0.045;
+      for (const target of this.targets) {
+        if (!(target.userData.physiologyScale instanceof THREE.Vector3))
+          target.userData.physiologyScale = target.scale.clone();
+        target.scale.copy(target.userData.physiologyScale as THREE.Vector3).multiplyScalar(breath);
+      }
     }
   }
 }

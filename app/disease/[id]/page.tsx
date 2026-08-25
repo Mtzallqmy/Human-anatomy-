@@ -20,5 +20,7 @@ export async function generateMetadata({ params }: DiseaseRouteProps): Promise<M
 
 export default async function Page({ params }: DiseaseRouteProps) {
   const { id } = await params;
-  return <DiseasePage diseaseId={id} />;
+  const disease = medicalRepository.getDiseaseById(id);
+  const structure = disease ? medicalRepository.getStructureById(disease.affectedStructureIds[0]) : undefined;
+  return <DiseasePage diseaseId={id} initialSystemId={structure?.systemId} />;
 }

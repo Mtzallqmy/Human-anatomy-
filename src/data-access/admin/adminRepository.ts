@@ -11,6 +11,11 @@ import {
   systemDraftSchema,
   type StructureDraftInput,
 } from "./adminSchemas";
+import {
+  imagingAnnotationSchema,
+  imagingStudyDraftSchema,
+  imagingUploadSchema,
+} from "@/src/data-access/imaging/schemas";
 
 type Client = SupabaseClient<Database>;
 type ContentStatus = Database["public"]["Enums"]["content_status"];
@@ -18,6 +23,7 @@ type EntityType = Database["public"]["Enums"]["content_entity_type"];
 type AppRole = Database["public"]["Enums"]["app_role"];
 type Resource =
   "systems" | "anatomical_structures" | "diseases" | "physiology_topics" | "references" | "three_d_assets";
+type DashboardResource = Resource | "imaging_studies";
 
 function client(): Client {
   const value = getSupabaseClient();
@@ -32,13 +38,14 @@ function assertResult(error: { message: string } | null) {
 export const adminRepository = {
   async dashboard() {
     const db = client();
-    const resources: Resource[] = [
+    const resources: DashboardResource[] = [
       "systems",
       "anatomical_structures",
       "diseases",
       "physiology_topics",
       "references",
       "three_d_assets",
+      "imaging_studies",
     ];
     const values = await Promise.all(
       resources.map(async (resource) => {
@@ -52,7 +59,10 @@ export const adminRepository = {
       .select("*", { count: "exact", head: true })
       .eq("status", "in_review");
     assertResult(waitingError);
-    return { ...Object.fromEntries(values), waiting: waiting ?? 0 } as Record<Resource | "waiting", number>;
+    return { ...Object.fromEntries(values), waiting: waiting ?? 0 } as Record<
+      DashboardResource | "waiting",
+      number
+    >;
   },
 
   async list(resource: Resource, page = 0, pageSize = 25) {
@@ -332,6 +342,133 @@ export const adminRepository = {
 
   async updateProfile(id: string, role: AppRole, status: "pending" | "active" | "suspended") {
     const { error } = await client().from("profiles").update({ role, status }).eq("id", id);
+    assertResult(error);
+  },
+
+  async listImagingStudies() {
+    const { data, error } = await client()
+      .from("imaging_studies")
+      .select(
+        "id,slug,modality,body_region,classification,status,source,license,attribution,de_identified,educational_use,review_due_at,updated_at,imaging_study_translations(locale,title,description),imaging_structure_links(structure_id)",
+      )
+      .order("updated_at", { ascending: false });
+    assertResult(error);
+    return data ?? [];
+  },
+
+  async createImagingStudy(
+    raw: unknown,
+    series: {
+      id: string;
+      orientation: "axial" | "coronal" | "sagittal" | "projection" | "microscopy";
+      name: { en: string; ar: string };
+      sequence?: string;
+    },
+    structureIds: string[],
+  ) {
+    const input = imagingStudyDraftSchema.parse(raw);
+    if (!/^SER_[A-Z0-9_]+$/.test(series.id)) throw new Error("Series ID must start with SER_.");
+    const db = client();
+    const { error } = await db.from("imaging_studies").insert({
+      id: input.id,
+      slug: input.slug,
+      modality: input.modality,
+      body_region: input.bodyRegion,
+      classification: input.classification,
+      source: input.source,
+      license: input.license,
+      attribution: input.attribution,
+      de_identified: input.deIdentified,
+      educational_use: input.educationalUse,
+      status: "draft",
+    });
+    assertResult(error);
+    const { error: translationError } = await db.from("imaging_study_translations").insert(
+      (["en", "ar"] as const).map((locale) => ({
+        study_id: input.id,
+        locale,
+        title: input.title[locale],
+        description: input.description[locale],
+      })),
+    );
+    assertResult(translationError);
+    const { error: seriesError } = await db.from("imaging_series").insert({
+      id: series.id,
+      study_id: input.id,
+      orientation: series.orientation,
+      sequence_name: series.sequence ?? null,
+    });
+    assertResult(seriesError);
+    const { error: seriesTranslationError } = await db.from("imaging_series_translations").insert(
+      (["en", "ar"] as const).map((locale) => ({
+        series_id: series.id,
+        locale,
+        name: series.name[locale],
+      })),
+    );
+    assertResult(seriesTranslationError);
+    if (structureIds.length) {
+      const { error: linkError } = await db.from("imaging_structure_links").insert(
+        structureIds.map((structureId, index) => ({
+          study_id: input.id,
+          structure_id: structureId,
+          is_primary: index === 0,
+        })),
+      );
+      assertResult(linkError);
+    }
+  },
+
+  async uploadImagingFrames(studyId: string, seriesId: string, files: File[]) {
+    if (files.length > 100) throw new Error("A batch may contain at most 100 web-ready frames.");
+    const db = client();
+    for (const [index, file] of files.entries()) {
+      imagingUploadSchema.parse({ size: file.size, type: file.type });
+      const safeName = `${String(index).padStart(4, "0")}-${crypto.randomUUID()}.webp`;
+      const path = `draft/${studyId.toLowerCase()}/${seriesId.toLowerCase()}/frames/${safeName}`;
+      const { error: uploadError } = await db.storage.from("medical-imaging").upload(path, file, {
+        upsert: false,
+        contentType: file.type,
+        cacheControl: "3600",
+      });
+      assertResult(uploadError);
+      const { error: frameError } = await db.from("imaging_frames").insert({
+        id: `${seriesId}_FRAME_${String(index).padStart(4, "0")}`,
+        series_id: seriesId,
+        frame_index: index,
+        storage_bucket: "medical-imaging",
+        storage_path: path,
+      });
+      assertResult(frameError);
+    }
+  },
+
+  async saveImagingAnnotation(raw: unknown, seriesId: string) {
+    const input = imagingAnnotationSchema.parse(raw);
+    const db = client();
+    const { error } = await db.from("imaging_annotations").insert({
+      id: input.id,
+      series_id: seriesId,
+      frame_index: input.frameIndex,
+      structure_id: input.structureId,
+      geometry_type: input.geometry.type,
+      geometry: input.geometry as Json,
+      color: input.color,
+    });
+    assertResult(error);
+    const { error: translationError } = await db.from("imaging_annotation_translations").insert(
+      (["en", "ar"] as const).map((locale) => ({
+        annotation_id: input.id,
+        locale,
+        label: input.label[locale],
+        description: input.description[locale],
+      })),
+    );
+    assertResult(translationError);
+  },
+
+  async transitionImaging(id: string, status: ContentStatus) {
+    const { error } = await client().from("imaging_studies").update({ status }).eq("id", id);
     assertResult(error);
   },
 };

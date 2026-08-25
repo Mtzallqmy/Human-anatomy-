@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
@@ -9,8 +10,9 @@ import { useContentStore } from "@/src/store/contentStore";
 import { usePathologyStore } from "@/src/store/pathologyStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
+import { getImagingStudiesForDisease } from "@/src/data/imaging/imagingStudies";
 
-export function DiseasePage({ diseaseId }: { diseaseId: string }) {
+export function DiseasePage({ diseaseId, initialSystemId }: { diseaseId: string; initialSystemId?: string }) {
   const { t, localize, isRTL } = useLocale();
   const disease = useContentStore((state) => state.diseases.find((item) => item.id === diseaseId));
   const structures = useContentStore((state) => state.structures);
@@ -21,7 +23,13 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
   );
   const selectDisease = usePathologyStore((state) => state.selectDisease);
   const selectStructure = useViewerStore((state) => state.setSelectedStructure);
+  const selectSystem = useViewerStore((state) => state.setSelectedSystem);
   const setMedicalTab = useUIStore((state) => state.setActiveMedicalTab);
+  const imaging = getImagingStudiesForDisease(diseaseId);
+
+  useEffect(() => {
+    if (initialSystemId) selectSystem(initialSystemId);
+  }, [initialSystemId, selectSystem]);
 
   if (!disease)
     return (
@@ -52,7 +60,7 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
           <h1>{localize(disease.name)}</h1>
           <p className="editorial-intro">{localize(disease.summary)}</p>
           <Link
-            href="/atlas"
+            href={`/atlas/structure/${disease.affectedStructureIds[0]}`}
             className="primary-link"
             onClick={() => {
               selectStructure(disease.affectedStructureIds[0]);
@@ -103,6 +111,21 @@ export function DiseasePage({ diseaseId }: { diseaseId: string }) {
             })}
           </div>
         </section>
+        {imaging.length > 0 && (
+          <section className="affected-section">
+            <div className="editorial-section-heading">
+              <h2>{t("medical.imaging")}</h2>
+            </div>
+            <div className="affected-links">
+              {imaging.map((study) => (
+                <Link key={study.id} href={`/imaging/${study.id}`}>
+                  {localize(study.title)}
+                  <ArrowUpRight size={15} />
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="disease-references">
           <div className="editorial-section-heading">
             <h2>{t("diseasePage.citations")}</h2>

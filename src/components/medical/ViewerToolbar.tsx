@@ -11,6 +11,8 @@ import {
   SlidersHorizontal,
   Tag,
   Waves,
+  Scissors,
+  Move3D,
 } from "lucide-react";
 import { useLocale } from "@/src/hooks/useLocale";
 import { useUIStore } from "@/src/store/uiStore";
@@ -81,6 +83,26 @@ export function ViewerToolbar() {
         onClick={() => state.setXrayMode(!state.xrayMode)}
       >
         <ScanLine size={15} />
+      </button>
+      <button
+        type="button"
+        className={`toolbar-button${state.sectionMode ? " toolbar-button--active" : ""}`}
+        title={t("atlas.section")}
+        aria-label={t("atlas.section")}
+        aria-pressed={state.sectionMode}
+        onClick={() => state.setSectionMode(!state.sectionMode)}
+      >
+        <Scissors size={15} />
+      </button>
+      <button
+        type="button"
+        className={`toolbar-button${state.explodedView ? " toolbar-button--active" : ""}`}
+        title={t("atlas.exploded")}
+        aria-label={t("atlas.exploded")}
+        aria-pressed={state.explodedView}
+        onClick={() => state.setExplodedView(!state.explodedView)}
+      >
+        <Move3D size={15} />
       </button>
       <button
         type="button"

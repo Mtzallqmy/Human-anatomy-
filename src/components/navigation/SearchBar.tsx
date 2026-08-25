@@ -9,6 +9,8 @@ import { useLocale } from "@/src/hooks/useLocale";
 import { useContentStore } from "@/src/store/contentStore";
 import { useViewerStore } from "@/src/store/viewerStore";
 import type { SearchResult } from "@/src/types/medical";
+import { imagingStudies } from "@/src/data/imaging/imagingStudies";
+import { physiologyAnimations } from "@/src/data/anatomy/humanBodyCatalog";
 
 function searchLocalCatalog(
   query: string,
@@ -48,6 +50,23 @@ function searchLocalCatalog(
         name: item.name,
         type: "disease" as const,
         href: `/disease/${item.id}`,
+      })),
+    ...physiologyAnimations
+      .filter((item) => matches(item.name.en, item.name.ar))
+      .map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: "physiology" as const,
+        systemId: item.systemId,
+        href: `/atlas/${systems.find((system) => system.id === item.systemId)?.slug ?? "human-body"}`,
+      })),
+    ...imagingStudies
+      .filter((item) => matches(item.title.en, item.title.ar))
+      .map((item) => ({
+        id: item.id,
+        name: item.title,
+        type: "imaging" as const,
+        href: `/imaging/${item.id}`,
       })),
   ].slice(0, 12);
 }

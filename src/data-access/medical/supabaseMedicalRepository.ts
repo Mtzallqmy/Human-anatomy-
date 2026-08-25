@@ -63,7 +63,7 @@ export const supabaseMedicalRepository = {
     return systemRowsSchema.parse(data).map((row) => {
       const localized = translations(row.system_translations);
       const metadata = systemMetadataSchema
-        .catch({ icon: "circle", accentColor: "#718394" })
+        .catch({ icon: "circle", accentColor: "#718394", rootStructureIds: [], organIds: [] })
         .parse(row.metadata);
       return {
         id: row.id,
@@ -72,8 +72,10 @@ export const supabaseMedicalRepository = {
         description: { en: localized.en.description, ar: localized.ar.description },
         icon: metadata.icon,
         available: row.is_available,
-        organIds: [],
+        organIds: metadata.organIds,
         accentColor: metadata.accentColor,
+        rootStructureIds: metadata.rootStructureIds,
+        status: "published",
       };
     });
   },

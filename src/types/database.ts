@@ -489,6 +489,515 @@ export type Database = {
           },
         ];
       };
+      imaging_annotation_translations: {
+        Row: {
+          annotation_id: string;
+          description: string;
+          label: string;
+          locale: Database["public"]["Enums"]["locale_code"];
+        };
+        Insert: {
+          annotation_id: string;
+          description?: string;
+          label: string;
+          locale: Database["public"]["Enums"]["locale_code"];
+        };
+        Update: {
+          annotation_id?: string;
+          description?: string;
+          label?: string;
+          locale?: Database["public"]["Enums"]["locale_code"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_annotation_translations_annotation_id_fkey";
+            columns: ["annotation_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_annotations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_annotations: {
+        Row: {
+          color: string;
+          created_at: string;
+          frame_index: number;
+          geometry: Json;
+          geometry_type: Database["public"]["Enums"]["annotation_geometry_type"];
+          id: string;
+          metadata: Json;
+          series_id: string;
+          structure_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          color?: string;
+          created_at?: string;
+          frame_index: number;
+          geometry: Json;
+          geometry_type: Database["public"]["Enums"]["annotation_geometry_type"];
+          id: string;
+          metadata?: Json;
+          series_id: string;
+          structure_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          frame_index?: number;
+          geometry?: Json;
+          geometry_type?: Database["public"]["Enums"]["annotation_geometry_type"];
+          id?: string;
+          metadata?: Json;
+          series_id?: string;
+          structure_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_annotations_series_id_fkey";
+            columns: ["series_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_series";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_annotations_structure_id_fkey";
+            columns: ["structure_id"];
+            isOneToOne: false;
+            referencedRelation: "anatomical_structures";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_disease_links: {
+        Row: {
+          disease_id: string;
+          study_id: string;
+        };
+        Insert: {
+          disease_id: string;
+          study_id: string;
+        };
+        Update: {
+          disease_id?: string;
+          study_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_disease_links_disease_id_fkey";
+            columns: ["disease_id"];
+            isOneToOne: false;
+            referencedRelation: "diseases";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_disease_links_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_frames: {
+        Row: {
+          created_at: string;
+          frame_index: number;
+          generated_variant: string | null;
+          height: number | null;
+          id: string;
+          metadata: Json;
+          series_id: string;
+          storage_bucket: string | null;
+          storage_path: string | null;
+          thumbnail_path: string | null;
+          width: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          frame_index: number;
+          generated_variant?: string | null;
+          height?: number | null;
+          id: string;
+          metadata?: Json;
+          series_id: string;
+          storage_bucket?: string | null;
+          storage_path?: string | null;
+          thumbnail_path?: string | null;
+          width?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          frame_index?: number;
+          generated_variant?: string | null;
+          height?: number | null;
+          id?: string;
+          metadata?: Json;
+          series_id?: string;
+          storage_bucket?: string | null;
+          storage_path?: string | null;
+          thumbnail_path?: string | null;
+          width?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_frames_series_id_fkey";
+            columns: ["series_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_series";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_references: {
+        Row: {
+          locator: string | null;
+          reference_id: string;
+          study_id: string;
+        };
+        Insert: {
+          locator?: string | null;
+          reference_id: string;
+          study_id: string;
+        };
+        Update: {
+          locator?: string | null;
+          reference_id?: string;
+          study_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_references_reference_id_fkey";
+            columns: ["reference_id"];
+            isOneToOne: false;
+            referencedRelation: "references";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_references_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_reviews: {
+        Row: {
+          created_at: string;
+          decision: Database["public"]["Enums"]["review_decision"];
+          id: string;
+          notes: string | null;
+          reviewed_at: string | null;
+          reviewer_id: string;
+          study_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          decision?: Database["public"]["Enums"]["review_decision"];
+          id?: string;
+          notes?: string | null;
+          reviewed_at?: string | null;
+          reviewer_id: string;
+          study_id: string;
+        };
+        Update: {
+          created_at?: string;
+          decision?: Database["public"]["Enums"]["review_decision"];
+          id?: string;
+          notes?: string | null;
+          reviewed_at?: string | null;
+          reviewer_id?: string;
+          study_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_reviews_reviewer_id_fkey";
+            columns: ["reviewer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_reviews_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_series: {
+        Row: {
+          created_at: string;
+          id: string;
+          metadata: Json;
+          orientation: Database["public"]["Enums"]["imaging_orientation"];
+          sequence_name: string | null;
+          sort_order: number;
+          study_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id: string;
+          metadata?: Json;
+          orientation: Database["public"]["Enums"]["imaging_orientation"];
+          sequence_name?: string | null;
+          sort_order?: number;
+          study_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          metadata?: Json;
+          orientation?: Database["public"]["Enums"]["imaging_orientation"];
+          sequence_name?: string | null;
+          sort_order?: number;
+          study_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_series_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_series_translations: {
+        Row: {
+          description: string;
+          locale: Database["public"]["Enums"]["locale_code"];
+          name: string;
+          series_id: string;
+        };
+        Insert: {
+          description?: string;
+          locale: Database["public"]["Enums"]["locale_code"];
+          name: string;
+          series_id: string;
+        };
+        Update: {
+          description?: string;
+          locale?: Database["public"]["Enums"]["locale_code"];
+          name?: string;
+          series_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_series_translations_series_id_fkey";
+            columns: ["series_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_series";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_structure_links: {
+        Row: {
+          is_primary: boolean;
+          structure_id: string;
+          study_id: string;
+        };
+        Insert: {
+          is_primary?: boolean;
+          structure_id: string;
+          study_id: string;
+        };
+        Update: {
+          is_primary?: boolean;
+          structure_id?: string;
+          study_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_structure_links_structure_id_fkey";
+            columns: ["structure_id"];
+            isOneToOne: false;
+            referencedRelation: "anatomical_structures";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_structure_links_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_studies: {
+        Row: {
+          attribution: string;
+          body_region: string;
+          classification: Database["public"]["Enums"]["imaging_classification"];
+          content_version: number;
+          created_at: string;
+          created_by: string | null;
+          de_identified: boolean;
+          deleted_at: string | null;
+          educational_use: boolean;
+          id: string;
+          last_reviewed_at: string | null;
+          last_reviewed_by: string | null;
+          license: string;
+          metadata: Json;
+          modality: Database["public"]["Enums"]["imaging_modality"];
+          review_due_at: string | null;
+          slug: string;
+          source: string;
+          status: Database["public"]["Enums"]["content_status"];
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          attribution: string;
+          body_region: string;
+          classification: Database["public"]["Enums"]["imaging_classification"];
+          content_version?: number;
+          created_at?: string;
+          created_by?: string | null;
+          de_identified?: boolean;
+          deleted_at?: string | null;
+          educational_use?: boolean;
+          id: string;
+          last_reviewed_at?: string | null;
+          last_reviewed_by?: string | null;
+          license: string;
+          metadata?: Json;
+          modality: Database["public"]["Enums"]["imaging_modality"];
+          review_due_at?: string | null;
+          slug: string;
+          source: string;
+          status?: Database["public"]["Enums"]["content_status"];
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          attribution?: string;
+          body_region?: string;
+          classification?: Database["public"]["Enums"]["imaging_classification"];
+          content_version?: number;
+          created_at?: string;
+          created_by?: string | null;
+          de_identified?: boolean;
+          deleted_at?: string | null;
+          educational_use?: boolean;
+          id?: string;
+          last_reviewed_at?: string | null;
+          last_reviewed_by?: string | null;
+          license?: string;
+          metadata?: Json;
+          modality?: Database["public"]["Enums"]["imaging_modality"];
+          review_due_at?: string | null;
+          slug?: string;
+          source?: string;
+          status?: Database["public"]["Enums"]["content_status"];
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_studies_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_studies_last_reviewed_by_fkey";
+            columns: ["last_reviewed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_studies_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_study_translations: {
+        Row: {
+          description: string;
+          locale: Database["public"]["Enums"]["locale_code"];
+          study_id: string;
+          title: string;
+        };
+        Insert: {
+          description?: string;
+          locale: Database["public"]["Enums"]["locale_code"];
+          study_id: string;
+          title: string;
+        };
+        Update: {
+          description?: string;
+          locale?: Database["public"]["Enums"]["locale_code"];
+          study_id?: string;
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_study_translations_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      imaging_versions: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          snapshot: Json;
+          study_id: string;
+          version_number: number;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          snapshot: Json;
+          study_id: string;
+          version_number: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          snapshot?: Json;
+          study_id?: string;
+          version_number?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "imaging_versions_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "imaging_versions_study_id_fkey";
+            columns: ["study_id"];
+            isOneToOne: false;
+            referencedRelation: "imaging_studies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       mesh_mappings: {
         Row: {
           asset_id: string;
@@ -1053,6 +1562,62 @@ export type Database = {
           },
         ];
       };
+      three_d_asset_versions: {
+        Row: {
+          asset_id: string;
+          checksum_sha256: string | null;
+          created_at: string;
+          draco_compressed: boolean;
+          file_size: number | null;
+          id: string;
+          ktx2_textures: boolean;
+          lod_level: string;
+          meshopt_compressed: boolean;
+          metadata: Json;
+          storage_bucket: string | null;
+          storage_path: string | null;
+          version: string;
+        };
+        Insert: {
+          asset_id: string;
+          checksum_sha256?: string | null;
+          created_at?: string;
+          draco_compressed?: boolean;
+          file_size?: number | null;
+          id?: string;
+          ktx2_textures?: boolean;
+          lod_level?: string;
+          meshopt_compressed?: boolean;
+          metadata?: Json;
+          storage_bucket?: string | null;
+          storage_path?: string | null;
+          version: string;
+        };
+        Update: {
+          asset_id?: string;
+          checksum_sha256?: string | null;
+          created_at?: string;
+          draco_compressed?: boolean;
+          file_size?: number | null;
+          id?: string;
+          ktx2_textures?: boolean;
+          lod_level?: string;
+          meshopt_compressed?: boolean;
+          metadata?: Json;
+          storage_bucket?: string | null;
+          storage_path?: string | null;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "three_d_asset_versions_asset_id_fkey";
+            columns: ["asset_id"];
+            isOneToOne: false;
+            referencedRelation: "three_d_assets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       three_d_assets: {
         Row: {
           asset_type: string;
@@ -1169,10 +1734,14 @@ export type Database = {
       };
     };
     Enums: {
+      annotation_geometry_type: "point" | "rectangle" | "polygon";
       app_role: "viewer" | "editor" | "reviewer" | "admin";
       content_entity_type:
         "system" | "structure" | "disease" | "physiology_topic" | "reference" | "three_d_asset";
       content_status: "draft" | "in_review" | "approved" | "published" | "rejected" | "archived";
+      imaging_classification: "anatomical" | "radiologic" | "illustrative" | "conceptual_pathology";
+      imaging_modality: "CT" | "MRI" | "XRAY" | "HISTOLOGY" | "PATHOLOGY";
+      imaging_orientation: "axial" | "coronal" | "sagittal" | "projection" | "microscopy";
       locale_code: "en" | "ar";
       profile_status: "pending" | "active" | "suspended";
       review_decision: "pending" | "approved" | "rejected" | "changes_requested";
@@ -1296,6 +1865,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      annotation_geometry_type: ["point", "rectangle", "polygon"],
       app_role: ["viewer", "editor", "reviewer", "admin"],
       content_entity_type: [
         "system",
@@ -1306,6 +1876,9 @@ export const Constants = {
         "three_d_asset",
       ],
       content_status: ["draft", "in_review", "approved", "published", "rejected", "archived"],
+      imaging_classification: ["anatomical", "radiologic", "illustrative", "conceptual_pathology"],
+      imaging_modality: ["CT", "MRI", "XRAY", "HISTOLOGY", "PATHOLOGY"],
+      imaging_orientation: ["axial", "coronal", "sagittal", "projection", "microscopy"],
       locale_code: ["en", "ar"],
       profile_status: ["pending", "active", "suspended"],
       review_decision: ["pending", "approved", "rejected", "changes_requested"],

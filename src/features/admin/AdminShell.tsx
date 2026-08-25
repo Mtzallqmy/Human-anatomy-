@@ -9,6 +9,7 @@ import {
   Database,
   FileHeart,
   HeartPulse,
+  Images,
   LogOut,
   Network,
   Shield,
@@ -26,6 +27,7 @@ const links = [
   ["/admin/physiology", "Physiology", Activity],
   ["/admin/references", "References", BookOpen],
   ["/admin/assets", "3D Assets", Boxes],
+  ["/admin/imaging", "Medical imaging", Images],
   ["/admin/review", "Review queue", Shield],
   ["/admin/users", "Users", Users],
 ] as const;

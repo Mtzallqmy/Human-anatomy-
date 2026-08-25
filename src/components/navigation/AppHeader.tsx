@@ -14,7 +14,8 @@ export function AppHeader({ atlas = false }: { atlas?: boolean }) {
   const setMobileMenuOpen = useUIStore((state) => state.setMobileMenuOpen);
   const links = [
     { href: "/atlas", label: t("nav.atlas") },
-    { href: "/systems/cardiovascular", label: t("nav.systems") },
+    { href: "/atlas/human-body", label: t("nav.systems") },
+    { href: "/imaging/IMG_CHEST_CT_EDU", label: t("nav.imaging") },
     { href: "/references", label: t("nav.references") },
   ];
 
@@ -43,7 +44,9 @@ export function AppHeader({ atlas = false }: { atlas?: boolean }) {
             key={link.href}
             href={link.href}
             className={
-              pathname === link.href || (link.href === "/atlas" && pathname.startsWith("/atlas"))
+              pathname === link.href ||
+              (link.href === "/atlas" && pathname === "/atlas") ||
+              (link.href.startsWith("/imaging") && pathname.startsWith("/imaging"))
                 ? "nav-link nav-link--active"
                 : "nav-link"
             }

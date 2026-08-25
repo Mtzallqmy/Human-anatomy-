@@ -11,13 +11,14 @@
     "build": "bash scripts/build-verified.sh",
     "build:vercel": "next build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run build && node --test tests/*.test.mjs",
+    "test": "npm run build && node --import tsx --test tests/*.test.mjs tests/*.test.ts",
     "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write src app docs README.md",
     "format:check": "prettier --check src app docs README.md",
     "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
-    "db:seed:render": "node --import tsx scripts/render-supabase-seed.ts"
+    "db:seed:render": "node --import tsx scripts/render-supabase-seed.ts",
+    "db:seed:stage4-5": "node --import tsx scripts/render-stage4-5-seed.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.112.4",

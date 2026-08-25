@@ -4,9 +4,26 @@ const shared = {
   organIds: [] as string[],
   available: false,
   accentColor: "#718394",
+  rootStructureIds: [] as string[],
+  status: "published" as const,
 };
 
 export const bodySystems: BodySystem[] = [
+  {
+    ...shared,
+    id: "SYS_FULL_BODY",
+    slug: "human-body",
+    name: { en: "Full body", ar: "جسم الإنسان" },
+    description: {
+      en: "A simplified multi-system overview for exploring anatomical layers.",
+      ar: "عرض مبسط متعدد الأجهزة لاستكشاف طبقات الجسم التشريحية.",
+    },
+    icon: "scan",
+    available: true,
+    organIds: ["ANAT_HUMAN_BODY"],
+    rootStructureIds: ["ANAT_HUMAN_BODY"],
+    accentColor: "#79b7c7",
+  },
   {
     ...shared,
     id: "SYS_CARDIOVASCULAR",
@@ -19,6 +36,7 @@ export const bodySystems: BodySystem[] = [
     icon: "heart",
     available: true,
     organIds: ["ANAT_HEART"],
+    rootStructureIds: ["ANAT_HEART"],
     accentColor: "#d36d68",
   },
   {
@@ -50,6 +68,10 @@ export const bodySystems: BodySystem[] = [
       ar: "الدماغ والحبل الشوكي والأعصاب المحيطية.",
     },
     icon: "brain",
+    available: true,
+    organIds: ["ANAT_BRAIN", "ANAT_SPINAL_CORD"],
+    rootStructureIds: ["ANAT_NERVOUS"],
+    accentColor: "#d7b58b",
   },
   {
     ...shared,
@@ -58,6 +80,10 @@ export const bodySystems: BodySystem[] = [
     name: { en: "Respiratory", ar: "الجهاز التنفسي" },
     description: { en: "Airways, lungs, and gas exchange.", ar: "الطرق الهوائية والرئتان وتبادل الغازات." },
     icon: "wind",
+    available: true,
+    organIds: ["ANAT_LUNG_RIGHT", "ANAT_LUNG_LEFT"],
+    rootStructureIds: ["ANAT_RESPIRATORY"],
+    accentColor: "#7ec9d5",
   },
   {
     ...shared,
@@ -66,6 +92,10 @@ export const bodySystems: BodySystem[] = [
     name: { en: "Digestive", ar: "الجهاز الهضمي" },
     description: { en: "Digestive tract and accessory organs.", ar: "القناة الهضمية والأعضاء الملحقة." },
     icon: "circle-dot",
+    available: true,
+    organIds: ["ANAT_STOMACH", "ANAT_LIVER", "ANAT_SMALL_INTESTINE"],
+    rootStructureIds: ["ANAT_DIGESTIVE"],
+    accentColor: "#c99369",
   },
   {
     ...shared,
@@ -74,6 +104,25 @@ export const bodySystems: BodySystem[] = [
     name: { en: "Urinary", ar: "الجهاز البولي" },
     description: { en: "Kidneys, ureters, and urinary bladder.", ar: "الكليتان والحالبان والمثانة البولية." },
     icon: "droplets",
+    available: true,
+    organIds: ["ANAT_KIDNEY_RIGHT", "ANAT_KIDNEY_LEFT", "ANAT_URINARY_BLADDER"],
+    rootStructureIds: ["ANAT_URINARY"],
+    accentColor: "#9f83c8",
+  },
+  {
+    ...shared,
+    id: "SYS_MUSCULOSKELETAL",
+    slug: "musculoskeletal",
+    name: { en: "Musculoskeletal", ar: "الجهاز العضلي الهيكلي" },
+    description: {
+      en: "Skeleton, joints, and major muscle groups.",
+      ar: "الهيكل العظمي والمفاصل والمجموعات العضلية الرئيسية.",
+    },
+    icon: "bone",
+    available: true,
+    organIds: ["ANAT_SKULL", "ANAT_VERTEBRAL_COLUMN", "ANAT_UPPER_LIMB", "ANAT_LOWER_LIMB"],
+    rootStructureIds: ["ANAT_MUSCULOSKELETAL"],
+    accentColor: "#c8ad8d",
   },
   {
     ...shared,

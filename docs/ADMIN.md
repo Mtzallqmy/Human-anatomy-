@@ -35,3 +35,13 @@ Open 3D Assets, select a licensed GLB/GLTF file, enter attribution and version i
 ## Publishing
 
 Editors submit drafts. Reviewers approve or reject with a recorded review. Administrators publish approved records. Public users cannot read drafts, even if they know an ID.
+
+## Multi-system bulk import
+
+The Structures page accepts validated CSV or JSON. Validation rejects duplicate IDs, unknown systems, missing bilingual fields, malformed stable IDs, and parents absent from the import batch. Valid records enter as drafts and still require review.
+
+## Medical imaging
+
+`/admin/imaging` creates bilingual studies and series, links anatomy, displays modality coverage and provenance gaps, and accepts staff-only PNG/JPEG/WebP batches. The browser decodes and re-encodes each file to WebP to remove EXIF metadata before upload. Each file is limited to 25 MB and each batch to 100 frames.
+
+Staff must confirm educational-use rights and de-identification. Public patient uploads are intentionally unsupported. The point annotation editor stores normalized coordinates from 0 to 1; database checks reject malformed geometry and unknown anatomical links.

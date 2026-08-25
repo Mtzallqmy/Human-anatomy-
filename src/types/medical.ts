@@ -27,6 +27,8 @@ export interface BodySystem {
   available: boolean;
   organIds: string[];
   accentColor: string;
+  rootStructureIds: string[];
+  status: "draft" | "review" | "published";
 }
 
 export interface AnatomicalStructure {
@@ -58,6 +60,11 @@ export interface DiseaseVisualState {
   scaleMultiplier?: number;
 }
 
+export type VisualizationType =
+  "morph" | "material" | "model_variant" | "shader" | "animation" | "annotation_only";
+
+export type VisualizationAccuracy = "anatomically_modeled" | "conceptual" | "illustrative";
+
 export interface DiseaseStage {
   id: string;
   order: number;
@@ -77,6 +84,8 @@ export interface Disease {
   affectedStructureIds: string[];
   stages: DiseaseStage[];
   referenceIds: string[];
+  visualizationType?: VisualizationType;
+  visualizationAccuracy?: VisualizationAccuracy;
 }
 
 export interface ModelAsset {
@@ -88,16 +97,109 @@ export interface ModelAsset {
   format: "glb" | "gltf" | "procedural";
   attribution: LocalizedText;
   license: string;
+  version?: string;
+  lod?: "simplified" | "standard" | "detailed";
+}
+
+export type StructureRelationshipType =
+  | "part_of"
+  | "adjacent_to"
+  | "supplies"
+  | "drains_into"
+  | "innervates"
+  | "connected_to"
+  | "passes_through"
+  | "controls";
+
+export interface StructureRelationship {
+  sourceStructureId: string;
+  targetStructureId: string;
+  type: StructureRelationshipType;
+}
+
+export interface PhysiologyStep {
+  id: string;
+  structureId: string;
+  name: LocalizedText;
+  description: LocalizedText;
+  order: number;
+}
+
+export interface PhysiologyAnimation {
+  id: string;
+  systemId: string;
+  name: LocalizedText;
+  structureIds: string[];
+  duration: number;
+  steps: PhysiologyStep[];
+}
+
+export type ImagingModality = "CT" | "MRI" | "XRAY" | "HISTOLOGY" | "PATHOLOGY";
+export type ImagingClassification = "anatomical" | "radiologic" | "illustrative" | "conceptual_pathology";
+
+export interface ImagingAnnotationGeometry {
+  type: "point" | "rectangle" | "polygon";
+  coordinates: number[][];
+}
+
+export interface ImagingAnnotation {
+  id: string;
+  frameIndex: number;
+  structureId: string;
+  label: LocalizedText;
+  description: LocalizedText;
+  geometry: ImagingAnnotationGeometry;
+  color: string;
+}
+
+export interface ImagingFrame {
+  id: string;
+  index: number;
+  imageUrl?: string;
+  thumbnailUrl?: string;
+  generatedVariant?: "chest-ct" | "brain-mri" | "chest-xray" | "liver-histology" | "kidney-histology";
+}
+
+export interface ImagingSeries {
+  id: string;
+  studyId: string;
+  name: LocalizedText;
+  orientation: "axial" | "coronal" | "sagittal" | "projection" | "microscopy";
+  sequence?: string;
+  frames: ImagingFrame[];
+  annotations: ImagingAnnotation[];
+}
+
+export interface ImagingStudy {
+  id: string;
+  slug: string;
+  modality: ImagingModality;
+  bodyRegion: string;
+  title: LocalizedText;
+  description: LocalizedText;
+  classification: ImagingClassification;
+  structureIds: string[];
+  diseaseIds: string[];
+  series: ImagingSeries[];
+  referenceIds: string[];
+  source: string;
+  license: string;
+  attribution: string;
+  deIdentified: boolean;
+  educationalUse: boolean;
+  status: "draft" | "in_review" | "approved" | "published";
+  version: number;
+  reviewDueAt?: string;
 }
 
 export interface SearchResult {
   id: string;
   name: LocalizedText;
-  type: "structure" | "system" | "disease";
+  type: "structure" | "system" | "disease" | "physiology" | "imaging";
   systemId?: string;
   href: string;
 }
 
 export type QualityMode = "low" | "medium" | "high";
 export type LabelMode = "off" | "simple" | "study";
-export type MedicalTab = "anatomy" | "physiology" | "pathology" | "references";
+export type MedicalTab = "anatomy" | "physiology" | "pathology" | "imaging" | "references";

@@ -1,4 +1,8 @@
-import { heartStructures } from "@/src/data/anatomy/heartStructures";
+import {
+  allHumanStructures,
+  expandedDiseases,
+  physiologyAnimations,
+} from "@/src/data/anatomy/humanBodyCatalog";
 import { modelAssets } from "@/src/data/assets/modelAssets";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
 import { scientificReferences } from "@/src/data/references/references";
@@ -9,14 +13,19 @@ export const medicalRepository = {
   getSystems: () => bodySystems,
   getSystemById: (id: string) => bodySystems.find((system) => system.id === id),
   getSystemBySlug: (slug: string) => bodySystems.find((system) => system.slug === slug),
-  getStructures: () => heartStructures,
-  getStructureById: (id: string) => heartStructures.find((structure) => structure.id === id),
+  getStructures: () => allHumanStructures,
+  getStructureById: (id: string) => allHumanStructures.find((structure) => structure.id === id),
   getSystemStructures: (systemId: string) =>
-    heartStructures.filter((structure) => structure.systemId === systemId),
-  getDiseases: () => heartDiseases,
-  getDiseaseById: (id: string) => heartDiseases.find((disease) => disease.id === id),
+    allHumanStructures.filter((structure) => structure.systemId === systemId),
+  getDiseases: () => [...heartDiseases, ...expandedDiseases],
+  getDiseaseById: (id: string) =>
+    [...heartDiseases, ...expandedDiseases].find((disease) => disease.id === id),
   getStructureDiseases: (structureId: string) =>
-    heartDiseases.filter((disease) => disease.affectedStructureIds.includes(structureId)),
+    [...heartDiseases, ...expandedDiseases].filter((disease) =>
+      disease.affectedStructureIds.includes(structureId),
+    ),
+  getPhysiologyAnimations: (systemId?: string) =>
+    systemId ? physiologyAnimations.filter((item) => item.systemId === systemId) : physiologyAnimations,
   getReferences: () => scientificReferences,
   getReferencesByIds: (ids: string[]) =>
     scientificReferences.filter((reference) => ids.includes(reference.id)),
@@ -27,7 +36,7 @@ export const medicalRepository = {
 
     const matches = (en: string, ar: string) =>
       en.toLocaleLowerCase().includes(normalized) || ar.includes(normalized);
-    const structures: SearchResult[] = heartStructures
+    const structures: SearchResult[] = allHumanStructures
       .filter(
         (item) =>
           matches(item.name.en, item.name.ar) || item.latinName?.toLocaleLowerCase().includes(normalized),
@@ -48,7 +57,7 @@ export const medicalRepository = {
         systemId: item.id,
         href: `/systems/${item.slug}`,
       }));
-    const diseases: SearchResult[] = heartDiseases
+    const diseases: SearchResult[] = [...heartDiseases, ...expandedDiseases]
       .filter((item) => matches(item.name.en, item.name.ar))
       .map((item) => ({ id: item.id, name: item.name, type: "disease", href: `/disease/${item.id}` }));
     return [...structures, ...systems, ...diseases].slice(0, 8);
