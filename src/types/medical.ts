@@ -134,7 +134,7 @@ export interface PhysiologyAnimation {
   steps: PhysiologyStep[];
 }
 
-export type ImagingModality = "CT" | "MRI" | "XRAY" | "HISTOLOGY" | "PATHOLOGY";
+export type ImagingModality = "CT" | "MRI" | "XRAY" | "ULTRASOUND" | "HISTOLOGY" | "PATHOLOGY";
 export type ImagingClassification = "anatomical" | "radiologic" | "illustrative" | "conceptual_pathology";
 
 export interface ImagingAnnotationGeometry {
@@ -152,12 +152,25 @@ export interface ImagingAnnotation {
   color: string;
 }
 
+export type GeneratedImagingVariant =
+  | "chest-ct"
+  | "brain-mri"
+  | "chest-xray"
+  | "liver-histology"
+  | "kidney-histology"
+  | "bone-xray"
+  | "muscle-mri"
+  | "thyroid-ultrasound"
+  | "lymph-node-ultrasound"
+  | "pelvic-ultrasound"
+  | "skin-histology";
+
 export interface ImagingFrame {
   id: string;
   index: number;
   imageUrl?: string;
   thumbnailUrl?: string;
-  generatedVariant?: "chest-ct" | "brain-mri" | "chest-xray" | "liver-histology" | "kidney-histology";
+  generatedVariant?: GeneratedImagingVariant;
 }
 
 export interface ImagingSeries {

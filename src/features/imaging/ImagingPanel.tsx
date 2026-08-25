@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUpRight, Images, TriangleAlert } from "lucide-react";
-import { getImagingStudiesForStructure } from "@/src/data/imaging/imagingStudies";
+import { getImagingStudiesForStructure } from "@/src/data/imaging/imagingCatalog";
 import { useLocale } from "@/src/hooks/useLocale";
 
 export function ImagingPanel({ structureId }: { structureId: string }) {

@@ -38,6 +38,7 @@ export function AtlasViewer() {
   const assets = useContentStore((state) => state.assets);
   const meshRegistry = useContentStore((state) => state.meshRegistry);
   const selectedStructure = structures.find((structure) => structure.id === structureId);
+  const selectedAsset = assets.find((asset) => asset.systemId === selectedSystemId);
   const selectedSystem = useContentStore((state) =>
     state.systems.find((system) => system.id === selectedSystemId),
   );
@@ -152,6 +153,12 @@ export function AtlasViewer() {
     );
   }, [comparisonMode, diseaseId, diseaseProgress, diseases]);
 
+  const modelNotice = selectedAsset?.format === "procedural"
+    ? t("atlas.proceduralNotice")
+    : selectedAsset
+      ? `${localize(selectedAsset.attribution)} · ${selectedAsset.license}`
+      : t("atlas.proceduralNotice");
+
   return (
     <div className="atlas-canvas-wrap" ref={containerRef}>
       <canvas ref={canvasRef} className="anatomy-canvas" aria-label={t("atlas.modelTitle")} />
@@ -176,7 +183,7 @@ export function AtlasViewer() {
         </div>
       )}
       <p className="viewer-interaction-hint">{t("atlas.rotateHint")}</p>
-      <p className="viewer-model-notice">{t("atlas.proceduralNotice")}</p>
+      <p className="viewer-model-notice">{modelNotice}</p>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { allHumanStructures, expandedDiseases } from "@/src/data/anatomy/humanBodyCatalog";
 import { supplementalStructures } from "@/src/data/anatomy/comprehensiveSystems";
 import { meshRegistry, modelAssets } from "@/src/data/assets/modelAssets";
+import { comprehensiveDiseases } from "@/src/data/pathology/comprehensiveDiseases";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
 import { scientificReferences } from "@/src/data/references/references";
 import { bodySystems } from "@/src/data/systems/systems";
@@ -16,7 +17,7 @@ import type {
 type DataSource = "local" | "supabase";
 
 const localStructures = [...allHumanStructures, ...supplementalStructures];
-const localDiseases = [...heartDiseases, ...expandedDiseases];
+const localDiseases = [...heartDiseases, ...expandedDiseases, ...comprehensiveDiseases];
 
 function mergeById<T extends { id: string }>(primary: T[], fallback: T[]): T[] {
   const merged = new Map(fallback.map((item) => [item.id, item]));

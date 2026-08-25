@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft, Columns2, ExternalLink, Layers3, ShieldCheck } from "lucide-react";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
-import { imagingStudies } from "@/src/data/imaging/imagingStudies";
+import { imagingStudies } from "@/src/data/imaging/imagingCatalog";
 import { MedicalContentBootstrap } from "@/src/features/anatomy/MedicalContentBootstrap";
 import { MedicalImageViewer } from "@/src/features/imaging/MedicalImageViewer";
 import { supabaseImagingRepository } from "@/src/data-access/imaging/supabaseImagingRepository";
