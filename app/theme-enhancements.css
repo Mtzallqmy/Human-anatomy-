@@ -108,14 +108,120 @@ body {
   line-height: 1.8;
   font-weight: 430;
 }
-.bilingual-medical-text--compact {
-  gap: 2px;
-}
+.bilingual-medical-text--compact { gap: 2px; }
 .bilingual-medical-text--compact .bilingual-medical-text__en,
 .bilingual-medical-text--compact .bilingual-medical-text__ar {
   font-size: 0.78rem;
   line-height: 1.45;
 }
+.structure-title--bilingual h2 { margin-bottom: 7px; }
+.structure-title--bilingual .bilingual-medical-text__en { font-size: 1.12rem; }
+.structure-title--bilingual .bilingual-medical-text__ar { font-size: 0.92rem; }
+
+.physiology-process-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 12px 0 14px;
+}
+.physiology-process-picker button {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--muted);
+  padding: 9px;
+  text-align: start;
+  cursor: pointer;
+}
+.physiology-process-picker button.is-active {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  color: var(--foreground);
+}
+.flow-step-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.reproductive-choice-page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+.reproductive-choice-main {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: clamp(42px, 7vw, 86px) 0 80px;
+}
+.reproductive-choice-main > header {
+  max-width: 850px;
+  margin-bottom: 34px;
+}
+.reproductive-choice-main > header > p:first-child {
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.reproductive-choice-main h1 {
+  margin: 8px 0 4px;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+.reproductive-choice-main h2 {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: clamp(1.3rem, 3vw, 2.15rem);
+  font-weight: 500;
+}
+.reproductive-choice-lead { max-width: 760px; color: var(--muted); line-height: 1.75; }
+.reproductive-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.reproductive-choice-grid article {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--surface);
+  padding: clamp(22px, 4vw, 34px);
+}
+.choice-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  margin-bottom: 22px;
+}
+.reproductive-choice-grid h3 { font-size: 1.55rem; margin: 0 0 4px; }
+.reproductive-choice-grid h4 { font-size: 1.1rem; font-weight: 500; color: var(--muted); margin: 0 0 18px; }
+.reproductive-choice-grid p { color: var(--muted); line-height: 1.75; }
+.choice-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 22px; }
+.choice-actions a,
+.whole-body-choice a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  color: var(--foreground);
+  text-decoration: none;
+  background: var(--surface-raised);
+}
+.whole-body-choice {
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-raised);
+  padding: 22px;
+}
+.whole-body-choice h3 { margin: 0 0 13px; }
+.whole-body-choice > div { display: flex; flex-wrap: wrap; gap: 9px; }
 
 html[data-theme="light"] .app-header,
 html[data-theme="comfort"] .app-header,
@@ -135,17 +241,13 @@ html[data-theme="comfort"] .nav-link,
 html[data-theme="light"] .system-item,
 html[data-theme="comfort"] .system-item,
 html[data-theme="light"] .structure-item,
-html[data-theme="comfort"] .structure-item {
-  color: var(--muted);
-}
+html[data-theme="comfort"] .structure-item { color: var(--muted); }
 html[data-theme="light"] .nav-link--active,
 html[data-theme="comfort"] .nav-link--active,
 html[data-theme="light"] .system-item--active,
 html[data-theme="comfort"] .system-item--active,
 html[data-theme="light"] .structure-item--active,
-html[data-theme="comfort"] .structure-item--active {
-  color: var(--foreground);
-}
+html[data-theme="comfort"] .structure-item--active { color: var(--foreground); }
 
 html[data-theme="light"] .medical-content .content-section,
 html[data-theme="comfort"] .medical-content .content-section {
@@ -156,4 +258,9 @@ html[data-theme="comfort"] .medical-content .content-section {
 @media (max-width: 980px) {
   .theme-switcher button span { display: none; }
   .theme-switcher button { width: 34px; justify-content: center; padding: 0; }
+  .physiology-process-picker { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .reproductive-choice-grid { grid-template-columns: 1fr; }
+  .reproductive-choice-main { width: min(100% - 22px, 1180px); padding-top: 28px; }
 }
