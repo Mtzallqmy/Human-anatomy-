@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
+import { MousePointer2, Rotate3D } from "lucide-react";
 import { ViewerToolbar } from "@/src/components/medical/ViewerToolbar";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
 import { StructureInfoPanel } from "@/src/components/panels/StructureInfoPanel";
@@ -30,9 +31,15 @@ export function AtlasPage({
 }) {
   const setSelectedStructure = useViewerStore((state) => state.setSelectedStructure);
   const setSelectedSystem = useViewerStore((state) => state.setSelectedSystem);
+  const selectedSystemId = useViewerStore((state) => state.selectedSystemId);
+  const selectedStructureId = useViewerStore((state) => state.selectedStructureId);
   const setPanelOpen = useUIStore((state) => state.setInformationPanelOpen);
   const structures = useContentStore((state) => state.structures);
-  const { t } = useLocale();
+  const systems = useContentStore((state) => state.systems);
+  const { t, localize, locale } = useLocale();
+  const selectedSystem = systems.find((item) => item.id === selectedSystemId);
+  const selectedStructure = structures.find((item) => item.id === selectedStructureId);
+  const label = (en: string, ar: string) => (locale === "ar" ? ar : en);
 
   useEffect(() => {
     const structure = initialStructureId
@@ -56,12 +63,22 @@ export function AtlasPage({
   ]);
 
   return (
-    <div className="atlas-page">
+    <div className="atlas-page atlas-page-enhanced">
       <MedicalContentBootstrap />
       <AppHeader atlas />
       <main className="atlas-layout">
         <SystemSidebar />
         <section className="viewer-region">
+          <div className="viewer-context-strip" aria-live="polite">
+            <div>
+              <span>{selectedSystem ? localize(selectedSystem.name) : label("Human anatomy", "تشريح الإنسان")}</span>
+              <strong>{selectedStructure ? localize(selectedStructure.name) : label("Choose a structure", "اختر تركيبًا")}</strong>
+            </div>
+            <div className="viewer-context-help" aria-hidden="true">
+              <span><Rotate3D size={14} /> {label("Drag to rotate", "اسحب للتدوير")}</span>
+              <span><MousePointer2 size={14} /> {label("Select to learn", "حدد للتعلم")}</span>
+            </div>
+          </div>
           <AppErrorBoundary
             title={t("common.error")}
             message={t("atlas.modelError")}
