@@ -10,7 +10,7 @@ import { useContentStore } from "@/src/store/contentStore";
 import { usePathologyStore } from "@/src/store/pathologyStore";
 import { useUIStore } from "@/src/store/uiStore";
 import { useViewerStore } from "@/src/store/viewerStore";
-import { getImagingStudiesForDisease } from "@/src/data/imaging/imagingStudies";
+import { getImagingStudiesForDisease } from "@/src/data/imaging/imagingCatalog";
 
 export function DiseasePage({ diseaseId, initialSystemId }: { diseaseId: string; initialSystemId?: string }) {
   const { t, localize, isRTL } = useLocale();
@@ -85,9 +85,9 @@ export function DiseasePage({ diseaseId, initialSystemId }: { diseaseId: string;
             <h2>{t("diseasePage.progression")}</h2>
           </div>
           <div className="stage-grid">
-            {disease.stages.map((stage) => (
+            {disease.stages.map((stage, index) => (
               <article key={stage.id} className="disease-stage-card">
-                <span>0{stage.order + 1}</span>
+                <span>{String(index + 1).padStart(2, "0")}</span>
                 <i className={stage.order === 0 ? "stage-dot stage-dot--healthy" : "stage-dot"} />
                 <h3>{localize(stage.name)}</h3>
                 <p>{localize(stage.description)}</p>
