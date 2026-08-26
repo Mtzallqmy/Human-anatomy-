@@ -12,7 +12,7 @@ import { bloodFlowSteps } from "@/src/data/physiology/bloodFlow";
 import { useLocale } from "@/src/hooks/useLocale";
 import { useContentStore } from "@/src/store/contentStore";
 import { useViewerStore } from "@/src/store/viewerStore";
-import type { AnatomicalStructure, PhysiologyAnimation } from "@/src/types/medical";
+import type { AnatomicalStructure, LocalizedText, PhysiologyAnimation } from "@/src/types/medical";
 
 const allPhysiologyAnimations = [
   ...physiologyAnimations,
@@ -20,6 +20,14 @@ const allPhysiologyAnimations = [
   ...sexSpecificPhysiologyAnimations,
   ...wholeBodyPhysiologyAnimations,
 ];
+
+type DisplayPathwayStep = {
+  id: string;
+  structureId: string;
+  name: LocalizedText;
+  description?: LocalizedText;
+  oxygenation: "oxygenated" | "deoxygenated";
+};
 
 export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure }) {
   const { t, locale } = useLocale();
@@ -40,15 +48,20 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
   const profile = getSystemLearningProfile(structure.systemId) ?? getSexSpecificLearningProfile(structure.systemId);
   const label = (en: string, ar: string) => (locale === "ar" ? ar : en);
   const sameSystemIds = new Set(structures.filter((item) => item.systemId === structure.systemId).map((item) => item.id));
-  const pathway = structure.systemId === "SYS_CARDIOVASCULAR"
-    ? bloodFlowSteps.map((step, index) => ({ ...step, id: `${step.structureId}-${index}` }))
-    : (animation?.steps ?? []).filter((step) => sameSystemIds.has(step.structureId)).map((step) => ({
-        id: step.id,
-        structureId: step.structureId,
-        name: step.name,
-        description: step.description,
-        oxygenation: "oxygenated" as const,
-      }));
+  const pathway: DisplayPathwayStep[] = structure.systemId === "SYS_CARDIOVASCULAR"
+    ? bloodFlowSteps.map((step, index) => ({
+        ...step,
+        id: `${step.structureId}-${index}`,
+      }))
+    : (animation?.steps ?? [])
+        .filter((step) => sameSystemIds.has(step.structureId))
+        .map((step) => ({
+          id: step.id,
+          structureId: step.structureId,
+          name: step.name,
+          description: step.description,
+          oxygenation: "oxygenated" as const,
+        }));
 
   return (
     <div className="medical-content physiology-panel-rich">
@@ -93,7 +106,7 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
                 <i className={`flow-dot flow-dot--${step.oxygenation === "oxygenated" ? "arterial" : "venous"}`} />
                 <span className="flow-step-copy">
                   <BilingualMedicalText value={step.name} compact />
-                  {"description" in step && step.description && <BilingualMedicalText value={step.description} compact />}
+                  {step.description && <BilingualMedicalText value={step.description} compact />}
                 </span>
               </button>
             </li>
