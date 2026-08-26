@@ -21,6 +21,7 @@ type AssetDefinition = {
   systemId: string;
   rootStructureId: string;
   bundle?: string;
+  fileName?: string;
   lod?: ModelAsset["lod"];
 };
 
@@ -39,18 +40,20 @@ const definitions: AssetDefinition[] = [
   { id: "MODEL_ZANATOMY_ENDOCRINE", systemId: "SYS_ENDOCRINE", rootStructureId: "ANAT_ENDOCRINE", bundle: "endocrine", lod: "detailed" },
   { id: "MODEL_ZANATOMY_LYMPHATIC", systemId: "SYS_LYMPHATIC", rootStructureId: "ANAT_LYMPHATIC", bundle: "lymphatic", lod: "detailed" },
   { id: "MODEL_ZANATOMY_REPRODUCTIVE", systemId: "SYS_REPRODUCTIVE", rootStructureId: "ANAT_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
-  { id: "MODEL_ZANATOMY_MALE_REPRODUCTIVE", systemId: "SYS_MALE_REPRODUCTIVE", rootStructureId: "ANAT_MALE_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_MALE_REPRODUCTIVE", systemId: "SYS_MALE_REPRODUCTIVE", rootStructureId: "ANAT_MALE_REPRODUCTIVE", fileName: "z-anatomy-male-reproductive.glb", lod: "detailed" },
   { id: "MODEL_ZANATOMY_FEMALE_REPRODUCTIVE", systemId: "SYS_FEMALE_REPRODUCTIVE", rootStructureId: "ANAT_FEMALE_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
   { id: "MODEL_PROCEDURAL_INTEGUMENTARY", systemId: "SYS_INTEGUMENTARY", rootStructureId: "ANAT_INTEGUMENTARY" },
 ];
 
 export const modelAssets: ModelAsset[] = definitions.map((definition) => {
-  const isLicensed = Boolean(definition.bundle);
+  const isLicensed = Boolean(definition.bundle || definition.fileName);
   return {
     id: definition.id,
-    url: definition.bundle
-      ? `${VANATOME_MODEL_BASE}/z-anatomy-1.4.0-${definition.bundle}.glb`
-      : null,
+    url: definition.fileName
+      ? `${VANATOME_MODEL_BASE}/${definition.fileName}`
+      : definition.bundle
+        ? `${VANATOME_MODEL_BASE}/z-anatomy-1.4.0-${definition.bundle}.glb`
+        : null,
     systemId: definition.systemId,
     rootStructureId: definition.rootStructureId,
     structureIds: catalogStructures
