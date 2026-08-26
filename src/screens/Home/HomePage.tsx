@@ -27,6 +27,8 @@ import { gsap } from "gsap";
 import { AppHeader } from "@/src/components/navigation/AppHeader";
 import { allHumanStructures } from "@/src/data/anatomy/humanBodyCatalog";
 import { supplementalStructures, systemLearningProfiles } from "@/src/data/anatomy/comprehensiveSystems";
+import { sexSpecificStructures, sexSpecificSystems } from "@/src/data/anatomy/sexSpecificAtlas";
+import { sexSpecificLearningProfiles } from "@/src/data/anatomy/sexSpecificLearningProfiles";
 import { bodySystems } from "@/src/data/systems/systems";
 import { useLocale } from "@/src/hooks/useLocale";
 
@@ -44,8 +46,12 @@ const icons: Record<string, LucideIcon> = {
   scan: ScanLine,
 };
 
-const totalStructures = allHumanStructures.length + supplementalStructures.length;
-const learningSystems = bodySystems.filter((system) => system.id !== "SYS_FULL_BODY");
+const totalStructures = allHumanStructures.length + supplementalStructures.length + sexSpecificStructures.length;
+const learningSystems = [
+  ...bodySystems.filter((system) => !["SYS_FULL_BODY", "SYS_REPRODUCTIVE"].includes(system.id)),
+  ...sexSpecificSystems,
+];
+const allLearningProfiles = [...systemLearningProfiles, ...sexSpecificLearningProfiles];
 
 export function HomePage() {
   const { t, isRTL, localize, locale } = useLocale();
@@ -108,14 +114,17 @@ export function HomePage() {
             </h1>
             <p className="hero-intro" data-hero-reveal>
               {label(
-                "Move from the whole body to a system, from a system to a structure, then connect its anatomy to the mechanism that makes it work. Built for active exploration rather than passive reading.",
-                "انتقل من الجسم كاملًا إلى الجهاز، ومن الجهاز إلى التركيب، ثم اربط تشريحه بالآلية التي تجعله يعمل. صُمم للاستكشاف النشط لا للقراءة السلبية فقط.",
+                "Move from the whole male or female body to a system, from a system to a structure, then connect its anatomy to the mechanism that makes it work. Built for active exploration rather than passive reading.",
+                "انتقل من جسم الرجل أو المرأة كاملًا إلى الجهاز، ومن الجهاز إلى التركيب، ثم اربط تشريحه بالآلية التي تجعله يعمل. صُمم للاستكشاف النشط لا للقراءة السلبية فقط.",
               )}
             </p>
             <div className="experience-hero-actions" data-hero-reveal>
-              <Link href="/atlas" className="primary-link">
-                {t("home.enter")}
+              <Link href="/atlas/male-body" className="primary-link">
+                {label("Male body 3D", "جسم الرجل ثلاثي الأبعاد")}
                 <ArrowRight size={17} className={isRTL ? "rtl-flip" : ""} />
+              </Link>
+              <Link href="/atlas/female-body" className="secondary-link">
+                {label("Female body 3D", "جسم المرأة ثلاثي الأبعاد")}
               </Link>
               <a href="#systems" className="secondary-link">
                 {label("Browse all systems", "استعرض كل الأجهزة")}
@@ -124,14 +133,14 @@ export function HomePage() {
             <div className="experience-stat-row" data-hero-reveal>
               <div>
                 <strong>{learningSystems.length}</strong>
-                <span>{label("body systems", "جهازًا")}</span>
+                <span>{label("learning paths", "مسار تعلم")}</span>
               </div>
               <div>
                 <strong>{totalStructures}+</strong>
                 <span>{label("mapped structures", "تركيبًا مشروحًا")}</span>
               </div>
               <div>
-                <strong>{systemLearningProfiles.length}</strong>
+                <strong>{allLearningProfiles.length}</strong>
                 <span>{label("deep physiology chapters", "فصل فسيولوجيا معمق")}</span>
               </div>
             </div>
@@ -142,23 +151,23 @@ export function HomePage() {
             <div className="explorer-orbit explorer-orbit--inner" />
             <div className="explorer-core">
               <ScanLine size={104} strokeWidth={0.75} aria-hidden="true" />
-              <span>{label("Human body", "جسم الإنسان")}</span>
+              <span>{label("Whole-body anatomy", "تشريح الجسم الكامل")}</span>
             </div>
-            <Link href="/atlas/cardiovascular" className="explorer-node explorer-node--one">
-              <Heart size={16} />
-              <span>{label("Circulation", "الدوران")}</span>
+            <Link href="/atlas/male-body" className="explorer-node explorer-node--one">
+              <ScanLine size={16} />
+              <span>{label("Male body", "جسم الرجل")}</span>
             </Link>
-            <Link href="/atlas/nervous" className="explorer-node explorer-node--two">
-              <Brain size={16} />
-              <span>{label("Neural", "العصبي")}</span>
+            <Link href="/atlas/female-body" className="explorer-node explorer-node--two">
+              <ScanLine size={16} />
+              <span>{label("Female body", "جسم المرأة")}</span>
             </Link>
-            <Link href="/atlas/respiratory" className="explorer-node explorer-node--three">
-              <Wind size={16} />
-              <span>{label("Gas exchange", "تبادل الغازات")}</span>
+            <Link href="/atlas/male-reproductive" className="explorer-node explorer-node--three">
+              <Circle size={16} />
+              <span>{label("Male reproductive", "التناسلي الذكري")}</span>
             </Link>
-            <Link href="/atlas/endocrine" className="explorer-node explorer-node--four">
-              <Sparkles size={16} />
-              <span>{label("Hormones", "الهرمونات")}</span>
+            <Link href="/atlas/female-reproductive" className="explorer-node explorer-node--four">
+              <Circle size={16} />
+              <span>{label("Female reproductive", "التناسلي الأنثوي")}</span>
             </Link>
             <div className="explorer-caption">
               <Network size={15} />
@@ -176,14 +185,14 @@ export function HomePage() {
           <div className="section-heading systems-showcase-heading">
             <div>
               <p className="eyebrow">{label("Complete body-system atlas", "أطلس متكامل لأجهزة الجسم")}</p>
-              <h2>{label("Choose a system. Learn it as one connected story.", "اختر جهازًا وتعلمه كقصة واحدة مترابطة.")}</h2>
+              <h2>{label("Choose a body, then a system. Learn it as one connected story.", "اختر الجسم ثم الجهاز وتعلمه كقصة واحدة مترابطة.")}</h2>
             </div>
             <p>{label("Each chapter combines structures, relationships, physiology, normal values and direct 3D exploration.", "يجمع كل فصل التراكيب والعلاقات والفسيولوجيا والقيم الطبيعية والاستكشاف ثلاثي الأبعاد مباشرة.")}</p>
           </div>
           <div className="systems-showcase-grid">
             {learningSystems.map((system, index) => {
               const Icon = icons[system.icon] ?? Network;
-              const profile = systemLearningProfiles.find((item) => item.systemId === system.id);
+              const profile = allLearningProfiles.find((item) => item.systemId === system.id);
               return (
                 <article
                   className="system-showcase-card"
@@ -247,7 +256,7 @@ export function HomePage() {
               <span>01</span>
               <Layers3 size={21} />
               <h3>{label("Orient", "تعرّف على المكان")}</h3>
-              <p>{label("Start with the system map and regional relationships before memorizing isolated names.", "ابدأ بخريطة الجهاز والعلاقات الموضعية قبل حفظ الأسماء منفردة.")}</p>
+              <p>{label("Start with the male or female whole-body map and regional relationships before memorizing isolated names.", "ابدأ بخريطة جسم الرجل أو المرأة والعلاقات الموضعية قبل حفظ الأسماء منفردة.")}</p>
             </article>
             <article>
               <span>02</span>
@@ -276,13 +285,18 @@ export function HomePage() {
               <span className="status-dot" />
               {label("Ready to explore", "جاهز للاستكشاف")}
             </p>
-            <h2>{label("Start with the whole body, then go as deep as you need.", "ابدأ بالجسم كاملًا، ثم تعمق بالقدر الذي تحتاجه.")}</h2>
+            <h2>{label("Start with the male or female whole body, then go as deep as you need.", "ابدأ بجسم الرجل أو المرأة كاملًا، ثم تعمق بالقدر الذي تحتاجه.")}</h2>
             <p>{label("The atlas keeps anatomy, physiology, pathology, imaging and references within the same learning context.", "يحافظ الأطلس على التشريح والفسيولوجيا والأمراض والتصوير والمراجع ضمن سياق تعلم واحد.")}</p>
           </div>
-          <Link href="/atlas/human-body" className="primary-link">
-            {t("nav.explore")}
-            <ArrowRight size={17} className={isRTL ? "rtl-flip" : ""} />
-          </Link>
+          <div className="experience-hero-actions">
+            <Link href="/atlas/male-body" className="primary-link">
+              {label("Male 3D", "الرجل 3D")}
+              <ArrowRight size={17} className={isRTL ? "rtl-flip" : ""} />
+            </Link>
+            <Link href="/atlas/female-body" className="secondary-link">
+              {label("Female 3D", "المرأة 3D")}
+            </Link>
+          </div>
         </section>
       </main>
       <footer className="site-footer">
