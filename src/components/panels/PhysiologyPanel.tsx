@@ -1,7 +1,7 @@
 "use client";
 
 import { Activity, Gauge, Pause, Play, SlidersHorizontal } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { BilingualMedicalText } from "@/src/components/medical/BilingualMedicalText";
 import { physiologyAnimations } from "@/src/data/anatomy/humanBodyCatalog";
 import { getSystemLearningProfile, supplementalPhysiologyAnimations } from "@/src/data/anatomy/comprehensiveSystems";
@@ -40,11 +40,11 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
     () => allPhysiologyAnimations.filter((item) => item.systemId === structure.systemId),
     [structure.systemId],
   );
-  const [animationId, setAnimationId] = useState<string>(animations[0]?.id ?? "");
-  useEffect(() => {
-    if (!animations.some((item) => item.id === animationId)) setAnimationId(animations[0]?.id ?? "");
-  }, [animationId, animations]);
-  const animation: PhysiologyAnimation | undefined = animations.find((item) => item.id === animationId) ?? animations[0];
+  const [animationId, setAnimationId] = useState<string>("");
+  const activeAnimationId = animations.some((item) => item.id === animationId)
+    ? animationId
+    : (animations[0]?.id ?? "");
+  const animation: PhysiologyAnimation | undefined = animations.find((item) => item.id === activeAnimationId);
   const profile = getSystemLearningProfile(structure.systemId) ?? getSexSpecificLearningProfile(structure.systemId);
   const label = (en: string, ar: string) => (locale === "ar" ? ar : en);
   const sameSystemIds = new Set(structures.filter((item) => item.systemId === structure.systemId).map((item) => item.id));
@@ -84,7 +84,7 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
         {animations.length > 1 && (
           <div className="physiology-process-picker" role="tablist" aria-label="Physiological processes">
             {animations.map((item) => (
-              <button key={item.id} type="button" className={item.id === animation?.id ? "is-active" : ""} onClick={() => setAnimationId(item.id)}>
+              <button key={item.id} type="button" className={item.id === activeAnimationId ? "is-active" : ""} onClick={() => setAnimationId(item.id)}>
                 <BilingualMedicalText value={item.name} compact />
               </button>
             ))}
