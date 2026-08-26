@@ -11,6 +11,7 @@ export interface DecoderConfiguration {
 }
 
 const ignoredWords = new Set(["system", "major", "human", "body", "structure", "organ", "musculus", "muscle", "gland"]);
+const memoryHeavySystems = new Set(["SYS_FULL_BODY", "SYS_MALE_BODY", "SYS_FEMALE_BODY", "SYS_MALE_REPRODUCTIVE", "SYS_FEMALE_REPRODUCTIVE"]);
 
 function normalize(value: string) {
   return value.toLowerCase().replaceAll("œ", "oe").replaceAll("æ", "ae").replace(/[^a-z0-9]+/g, " ").trim();
@@ -106,6 +107,15 @@ function adaptExternalModel(scene: THREE.Group, structures: AnatomicalStructure[
   return scene;
 }
 
+function prefersSafeModel(asset: ModelAsset) {
+  if (typeof window === "undefined" || !memoryHeavySystems.has(asset.systemId)) return false;
+  const navigatorWithMemory = navigator as Navigator & { deviceMemory?: number };
+  const memory = navigatorWithMemory.deviceMemory ?? 4;
+  const coarse = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+  const narrow = Math.min(window.innerWidth, window.innerHeight) < 820;
+  return memory <= 4 || coarse || narrow;
+}
+
 async function loadProcedural(asset: ModelAsset, structures: AnatomicalStructure[]) {
   if (asset.systemId === "SYS_CARDIOVASCULAR") return createProceduralHeart();
   const { createProceduralFullBody, createProceduralSystem } = await import("@/src/three/loaders/ProceduralSystemFactory");
@@ -121,7 +131,11 @@ export class ModelLoader {
   }
 
   async load(asset: ModelAsset, structures: AnatomicalStructure[] = []): Promise<THREE.Group> {
-    if (asset.format === "procedural" || !asset.url) return loadProcedural(asset, structures);
+    if (asset.format === "procedural" || !asset.url || prefersSafeModel(asset)) {
+      const fallback = await loadProcedural(asset, structures);
+      if (asset.format !== "procedural" && asset.url) fallback.userData.fallbackReason = "mobile-memory-safety";
+      return fallback;
+    }
     try {
       const { GLTFLoader } = await import("three/examples/jsm/loaders/GLTFLoader.js");
       const loader = new GLTFLoader();

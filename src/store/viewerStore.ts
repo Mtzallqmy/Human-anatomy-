@@ -41,7 +41,7 @@ export const useViewerStore = create<ViewerState>((set) => ({
   sectionMode: false,
   explodedView: false,
   labelMode: "simple",
-  qualityMode: "high",
+  qualityMode: "medium",
   bloodFlowEnabled: false,
   visibleSystemIds: [
     "SYS_CARDIOVASCULAR",
