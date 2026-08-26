@@ -6,6 +6,7 @@ import { BilingualMedicalText } from "@/src/components/medical/BilingualMedicalT
 import { physiologyAnimations } from "@/src/data/anatomy/humanBodyCatalog";
 import { getSystemLearningProfile, supplementalPhysiologyAnimations } from "@/src/data/anatomy/comprehensiveSystems";
 import { sexSpecificPhysiologyAnimations } from "@/src/data/anatomy/sexSpecificAtlas";
+import { getSexSpecificLearningProfile } from "@/src/data/anatomy/sexSpecificLearningProfiles";
 import { wholeBodyPhysiologyAnimations } from "@/src/data/physiology/wholeBodyProcesses";
 import { bloodFlowSteps } from "@/src/data/physiology/bloodFlow";
 import { useLocale } from "@/src/hooks/useLocale";
@@ -36,7 +37,7 @@ export function PhysiologyPanel({ structure }: { structure: AnatomicalStructure 
     if (!animations.some((item) => item.id === animationId)) setAnimationId(animations[0]?.id ?? "");
   }, [animationId, animations]);
   const animation: PhysiologyAnimation | undefined = animations.find((item) => item.id === animationId) ?? animations[0];
-  const profile = getSystemLearningProfile(structure.systemId);
+  const profile = getSystemLearningProfile(structure.systemId) ?? getSexSpecificLearningProfile(structure.systemId);
   const label = (en: string, ar: string) => (locale === "ar" ? ar : en);
   const sameSystemIds = new Set(structures.filter((item) => item.systemId === structure.systemId).map((item) => item.id));
   const pathway = structure.systemId === "SYS_CARDIOVASCULAR"
