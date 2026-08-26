@@ -4,6 +4,7 @@ import "./globals.css";
 import "./experience.css";
 import "./panel-enhancements.css";
 import "./theme-enhancements.css";
+import "./perfection.css";
 
 const productionHost =
   process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "human-anatomy-medical-atlas.vercel.app";

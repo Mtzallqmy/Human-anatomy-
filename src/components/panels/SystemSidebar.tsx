@@ -57,10 +57,15 @@ function StructureNode({
   const { localize } = useLocale();
   const [expanded, setExpanded] = useState(depth === 0);
   const children = structures.filter((item) => item.parentId === structure.id);
+  const hasChildren = children.length > 0;
+  const isActive = structure.id === selectedId;
   return (
     <div className="structure-tree-node">
-      <div className="structure-tree-row" style={{ paddingInlineStart: `${depth * 13}px` }}>
-        {children.length ? (
+      <div
+        className="structure-tree-row"
+        style={{ paddingInlineStart: `${depth * 12}px`, opacity: depth > 2 ? 0.9 - depth * 0.03 : 1 }}
+      >
+        {hasChildren ? (
           <button
             type="button"
             className="tree-expand"
@@ -75,11 +80,28 @@ function StructureNode({
         )}
         <button
           type="button"
-          className={`structure-item${structure.id === selectedId ? " structure-item--active" : ""}`}
+          className={`structure-item${isActive ? " structure-item--active" : ""}`}
           onClick={() => onSelect(structure)}
+          title={localize(structure.name)}
         >
-          <span className="structure-indicator" />
-          {localize(structure.name)}
+          <span className="structure-indicator" style={{ opacity: isActive ? 1 : 0.62 }} />
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {localize(structure.name)}
+          </span>
+          {hasChildren && !expanded && (
+            <span
+              style={{
+                marginInlineStart: "auto",
+                fontSize: "0.58rem",
+                color: "var(--subtle)",
+                background: "rgba(255,255,255,0.06)",
+                padding: "1px 5px",
+                borderRadius: 999,
+              }}
+            >
+              {children.length}
+            </span>
+          )}
         </button>
       </div>
       {expanded &&
@@ -211,21 +233,39 @@ export function SystemSidebar() {
       <div className="sidebar-divider" />
       <div className="structure-list-heading">
         <p>{t("atlas.structuresTitle")}</p>
-        <span>{structures.length}</span>
+        <span title={`${structures.length} structures`} style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+          {structures.length}
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "var(--success)",
+              boxShadow: "0 0 8px rgba(132,167,144,0.5)",
+            }}
+          />
+        </span>
       </div>
       <div className="structure-list structure-tree">
-        {roots.map((structure) => (
-          <StructureNode
-            key={structure.id}
-            structure={structure}
-            structures={structures}
-            selectedId={selectedStructureId}
-            depth={0}
-            onSelect={chooseStructure}
-          />
-        ))}
+        {roots.length === 0 ? (
+          <p style={{ padding: "14px 8px", color: "var(--muted)", fontSize: "0.72rem" }}>{t("common.noResults")}</p>
+        ) : (
+          roots.map((structure) => (
+            <StructureNode
+              key={structure.id}
+              structure={structure}
+              structures={structures}
+              selectedId={selectedStructureId}
+              depth={0}
+              onSelect={chooseStructure}
+            />
+          ))
+        )}
       </div>
-      <div className="sidebar-footer">{t("common.educationOnly")}</div>
+      <div className="sidebar-footer" style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--subtle)", opacity: 0.7 }} />
+        {t("common.educationOnly")}
+      </div>
     </aside>
   );
 }

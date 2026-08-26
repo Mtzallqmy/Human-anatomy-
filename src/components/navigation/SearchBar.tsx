@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRight, Search, X } from "lucide-react";
+import { ArrowUpRight, Search, X, Heart, Bone, Brain, ScanLine, Stethoscope, Layers3 } from "lucide-react";
 import { supabaseMedicalRepository } from "@/src/data-access/medical/supabaseMedicalRepository";
 import { useLocale } from "@/src/hooks/useLocale";
 import { useContentStore } from "@/src/store/contentStore";
@@ -96,6 +96,27 @@ export function SearchBar() {
     staleTime: 60_000,
   });
   const results = remoteSearch.data ?? localResults;
+  const grouped = {
+    structure: results.filter((r) => r.type === "structure"),
+    system: results.filter((r) => r.type === "system"),
+    disease: results.filter((r) => r.type === "disease"),
+    imaging: results.filter((r) => r.type === "imaging"),
+    physiology: results.filter((r) => r.type === "physiology"),
+  };
+  const typeIcon: Record<string, typeof Search> = {
+    structure: Layers3,
+    system: Heart,
+    disease: Stethoscope,
+    imaging: ScanLine,
+    physiology: Brain,
+  } as unknown as Record<string, typeof Search>;
+  const typeLabel: Record<string, string> = {
+    structure: t("search.typeStructure"),
+    system: t("search.typeSystem"),
+    disease: t("search.typeDisease"),
+    imaging: t("search.typeImaging"),
+    physiology: "Physiology",
+  };
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 220);
@@ -164,29 +185,58 @@ export function SearchBar() {
           aria-label={t("search.results")}
         >
           {results.length === 0 ? (
-            <p className="search-empty">{t("common.noResults")}</p>
+            <div className="search-empty">
+              <p>{t("common.noResults")}</p>
+              <small style={{ color: "var(--subtle)", fontSize: "0.68rem" }}>
+                {t("search.compactPlaceholder")}
+              </small>
+            </div>
           ) : (
-            results.map((result) => (
-              <button
-                key={`${result.type}-${result.id}`}
-                type="button"
-                className="search-result"
-                role="option"
-                aria-selected="false"
-                onClick={() => {
-                  if (result.type === "structure") setStructure(result.id);
-                  setOpen(false);
-                  setQuery("");
-                  router.push(result.href);
-                }}
-              >
-                <span>
-                  <strong>{localize(result.name)}</strong>
-                  <small>{t(`search.type${result.type[0].toUpperCase()}${result.type.slice(1)}`)}</small>
-                </span>
-                <ArrowUpRight size={14} />
-              </button>
-            ))
+            (Object.entries(grouped) as [string, typeof results][]).map(([type, list]) =>
+              list.length ? (
+                <div key={type} role="group" aria-label={typeLabel[type]}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "10px 8px 4px",
+                      color: "var(--subtle)",
+                      fontSize: "0.62rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    {(() => {
+                      const Icon = typeIcon[type] ?? Search;
+                      return <Icon size={11} />;
+                    })()}
+                    {typeLabel[type]} · {list.length}
+                  </div>
+                  {list.map((result) => (
+                    <button
+                      key={`${result.type}-${result.id}`}
+                      type="button"
+                      className="search-result"
+                      role="option"
+                      aria-selected="false"
+                      onClick={() => {
+                        if (result.type === "structure") setStructure(result.id);
+                        setOpen(false);
+                        setQuery("");
+                        router.push(result.href);
+                      }}
+                    >
+                      <span>
+                        <strong>{localize(result.name)}</strong>
+                        <small>{result.systemId ?? result.type}</small>
+                      </span>
+                      <ArrowUpRight size={14} />
+                    </button>
+                  ))}
+                </div>
+              ) : null,
+            )
           )}
         </div>
       )}

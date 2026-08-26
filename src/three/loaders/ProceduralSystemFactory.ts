@@ -4,17 +4,19 @@ import type { AnatomicalStructure } from "@/src/types/medical";
 type Position = readonly [number, number, number];
 
 const systemColors: Record<string, string> = {
-  SYS_RESPIRATORY: "#75b9c5",
-  SYS_DIGESTIVE: "#bd8062",
-  SYS_URINARY: "#8d77ba",
-  SYS_NERVOUS: "#d0ad7e",
-  SYS_MUSCULOSKELETAL: "#c7b49c",
-  SYS_SKELETAL: "#d8c9ae",
-  SYS_MUSCULAR: "#c87369",
-  SYS_ENDOCRINE: "#d29aba",
-  SYS_LYMPHATIC: "#83b892",
-  SYS_REPRODUCTIVE: "#c88eac",
-  SYS_INTEGUMENTARY: "#d39b78",
+  SYS_RESPIRATORY: "#6eb8c8",
+  SYS_DIGESTIVE: "#c07a52",
+  SYS_URINARY: "#8a74c0",
+  SYS_NERVOUS: "#d8b07a",
+  SYS_MUSCULOSKELETAL: "#c9b8a0",
+  SYS_SKELETAL: "#e2d2b0",
+  SYS_MUSCULAR: "#d46358",
+  SYS_ENDOCRINE: "#d48ab8",
+  SYS_LYMPHATIC: "#6fbf86",
+  SYS_REPRODUCTIVE: "#d08ab0",
+  SYS_INTEGUMENTARY: "#d98e68",
+  SYS_CARDIOVASCULAR: "#d06058",
+  SYS_FULL_BODY: "#7a8fa0",
 };
 
 const positions: Record<string, Position> = {
@@ -116,43 +118,64 @@ const positions: Record<string, Position> = {
   ANAT_SEBACEOUS_GLAND: [-0.55, -0.75, 0.35],
 };
 
-function material(color: string, opacity = 0.9) {
+function material(color: string, opacity = 0.94) {
   const value = new THREE.MeshPhysicalMaterial({
     color,
-    roughness: 0.54,
-    metalness: 0,
-    clearcoat: 0.16,
-    clearcoatRoughness: 0.48,
+    roughness: 0.42,
+    metalness: 0.04,
+    clearcoat: 0.28,
+    clearcoatRoughness: 0.38,
+    sheen: 0.18,
+    sheenColor: new THREE.Color(color).multiplyScalar(1.12),
     transparent: opacity < 1,
     opacity,
+    side: THREE.DoubleSide,
   });
   value.userData.originalColor = value.color.getHex();
   value.userData.originalOpacity = opacity;
   return value;
 }
 
+function detailRidge(parent: THREE.Mesh, color: string) {
+  const ridge = new THREE.Mesh(
+    new THREE.TorusGeometry(0.32, 0.016, 8, 32, Math.PI * 1.6),
+    new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(color).multiplyScalar(0.82),
+      roughness: 0.38,
+      transparent: true,
+      opacity: 0.32,
+    }),
+  );
+  ridge.rotation.x = Math.PI / 2.2;
+  ridge.position.y = 0.12;
+  parent.add(ridge);
+}
+
 function geometryFor(id: string): THREE.BufferGeometry {
   if (/TRACHEA|ESOPHAGUS|URETHRA|SPINAL_CORD|VERTEBRAL|TENDON|MUSCLE_FIBER/.test(id))
-    return new THREE.CapsuleGeometry(0.14, 1.4, 10, 20);
+    return new THREE.CapsuleGeometry(0.14, 1.45, 12, 24);
   if (/URETERS|MAIN_BRONCHI|BRONCHIAL_TREE|PERIPHERAL_NERVES|LYMPH_VESSELS|UTERINE_TUBES/.test(id))
-    return new THREE.TorusKnotGeometry(0.42, 0.055, 80, 9, 2, 3);
-  if (/LUNG/.test(id)) return new THREE.CapsuleGeometry(0.5, 1.1, 16, 28);
-  if (/KIDNEY/.test(id)) return new THREE.TorusGeometry(0.42, 0.19, 20, 40, Math.PI * 1.72);
-  if (/INTESTINE/.test(id)) return new THREE.TorusKnotGeometry(0.54, 0.1, 110, 12, 3, 4);
+    return new THREE.TorusKnotGeometry(0.42, 0.048, 96, 10, 2, 3);
+  if (/LUNG/.test(id)) return new THREE.CapsuleGeometry(0.5, 1.18, 18, 32);
+  if (/KIDNEY/.test(id)) return new THREE.TorusGeometry(0.42, 0.19, 22, 44, Math.PI * 1.72);
+  if (/INTESTINE/.test(id)) return new THREE.TorusKnotGeometry(0.54, 0.09, 120, 14, 3, 4);
   if (/DIAPHRAGM|PELVIS|RIB_CAGE|SYNOVIAL_JOINT/.test(id))
-    return new THREE.TorusGeometry(0.8, 0.08, 14, 54, Math.PI);
+    return new THREE.TorusGeometry(0.8, 0.075, 16, 56, Math.PI);
   if (/LIMB|BICEPS|TRICEPS|QUADRICEPS|HAMSTRINGS|GASTROCNEMIUS|SKELETAL_MUSCLE/.test(id))
-    return new THREE.CapsuleGeometry(0.2, 1.1, 10, 20);
-  if (/SKULL|BRAIN|CEREBR|LOBE/.test(id)) return new THREE.SphereGeometry(0.68, 34, 26);
-  if (/ALVEOLI|TRABECULAR|MARROW/.test(id)) return new THREE.IcosahedronGeometry(0.36, 2);
+    return new THREE.CapsuleGeometry(0.2, 1.15, 12, 22);
+  if (/SKULL|BRAIN|CEREBR|LOBE/.test(id)) return new THREE.SphereGeometry(0.68, 38, 30);
+  if (/ALVEOLI|TRABECULAR|MARROW/.test(id)) return new THREE.IcosahedronGeometry(0.36, 3);
   if (/AXIAL_SKELETON|APPENDICULAR_SKELETON/.test(id))
-    return new THREE.CapsuleGeometry(0.28, 2.15, 12, 24);
-  if (/SARCOMERE/.test(id)) return new THREE.BoxGeometry(1.2, 0.26, 0.26, 4, 1, 1);
-  if (/LYMPH_NODES/.test(id)) return new THREE.DodecahedronGeometry(0.38, 1);
-  if (/EPIDERMIS|DERMIS|HYPODERMIS/.test(id)) return new THREE.BoxGeometry(1.5, 0.18, 1.1);
-  if (/HAIR_FOLLICLE/.test(id)) return new THREE.CapsuleGeometry(0.08, 0.8, 8, 14);
-  if (/SWEAT_GLAND/.test(id)) return new THREE.TorusKnotGeometry(0.24, 0.06, 60, 8, 2, 3);
-  return new THREE.SphereGeometry(0.42, 30, 22);
+    return new THREE.CapsuleGeometry(0.28, 2.15, 14, 26);
+  if (/SARCOMERE/.test(id)) return new THREE.BoxGeometry(1.2, 0.26, 0.26, 6, 2, 2);
+  if (/LYMPH_NODES/.test(id)) return new THREE.DodecahedronGeometry(0.38, 2);
+  if (/EPIDERMIS|DERMIS|HYPODERMIS/.test(id)) return new THREE.BoxGeometry(1.5, 0.18, 1.1, 4, 1, 1);
+  if (/HAIR_FOLLICLE/.test(id)) return new THREE.CapsuleGeometry(0.08, 0.82, 10, 16);
+  if (/SWEAT_GLAND/.test(id)) return new THREE.TorusKnotGeometry(0.24, 0.055, 72, 10, 2, 3);
+  if (/CEREBELLUM/.test(id)) return new THREE.SphereGeometry(0.52, 32, 24);
+  if (/BRAIN_VENTRICLES/.test(id)) return new THREE.CapsuleGeometry(0.18, 0.9, 10, 18);
+  if (/CORNEA|LENS|RETINA/.test(id)) return new THREE.SphereGeometry(0.32, 24, 18);
+  return new THREE.SphereGeometry(0.42, 32, 24);
 }
 
 function scaleFor(id: string): Position {
@@ -193,7 +216,7 @@ export function createProceduralSystem(systemId: string, structures: AnatomicalS
 
   for (const structure of structures) {
     if (structure.meshIds.length === 0) continue;
-    const mesh = new THREE.Mesh(geometryFor(structure.id), material(secondaryColor(baseColor, visibleIndex)));
+    const mesh = new THREE.Mesh(geometryFor(structure.id), material(secondaryColor(baseColor, visibleIndex), 0.92));
     mesh.name = structure.meshIds[0];
     mesh.position.set(...(positions[structure.id] ?? structure.labelAnchor ?? [0, 0, 0]));
     mesh.scale.set(...scaleFor(structure.id));
@@ -201,6 +224,8 @@ export function createProceduralSystem(systemId: string, structures: AnatomicalS
     mesh.receiveShadow = true;
     mesh.userData.systemId = systemId;
     mesh.userData.structureId = structure.id;
+    // subtle surface detail for larger organs
+    if (/LUNG|LIVER|KIDNEY|BRAIN|STOMACH/.test(structure.id)) detailRidge(mesh, baseColor);
     group.add(mesh);
     visibleIndex += 1;
   }
@@ -209,6 +234,15 @@ export function createProceduralSystem(systemId: string, structures: AnatomicalS
   const box = new THREE.Box3().setFromObject(group);
   const center = box.getCenter(new THREE.Vector3());
   group.position.sub(center);
+  // gentle ambient occlusion helper — dark ground disc
+  const shadowCatcher = new THREE.Mesh(
+    new THREE.CircleGeometry(1.35, 40),
+    new THREE.MeshBasicMaterial({ color: "#0a0e12", transparent: true, opacity: 0.18, side: THREE.DoubleSide }),
+  );
+  shadowCatcher.rotation.x = -Math.PI / 2;
+  shadowCatcher.position.y = box.min.y - center.y - 0.08;
+  shadowCatcher.name = "Ground_ShadowCatcher";
+  group.add(shadowCatcher);
   return group;
 }
 

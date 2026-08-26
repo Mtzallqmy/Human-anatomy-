@@ -153,11 +153,13 @@ export function AtlasViewer() {
     );
   }, [comparisonMode, diseaseId, diseaseProgress, diseases]);
 
-  const modelNotice = selectedAsset?.format === "procedural"
-    ? t("atlas.proceduralNotice")
-    : selectedAsset
-      ? `${localize(selectedAsset.attribution)} · ${selectedAsset.license}`
-      : t("atlas.proceduralNotice");
+  const modelNotice =
+    selectedAsset?.format === "procedural"
+      ? `✦ ${t("atlas.proceduralNotice")} · Educational abstraction — high-detail, interactive`
+      : selectedAsset
+        ? `◈ ${localize(selectedAsset.attribution)} · ${selectedAsset.license} · ${selectedAsset.format.toUpperCase()}`
+        : t("atlas.proceduralNotice");
+  const qualityLabel: Record<string, string> = { low: "LQ", medium: "HQ", high: "UHD" };
 
   return (
     <div className="atlas-canvas-wrap" ref={containerRef}>
@@ -180,10 +182,46 @@ export function AtlasViewer() {
           <i />
           <span>{t("common.selected")}</span>
           <strong>{localize(selectedStructure.name)}</strong>
+          {selectedStructure.latinName && (
+            <small style={{ color: "var(--muted)", fontSize: "0.62rem", fontStyle: "italic" }}>
+              {selectedStructure.latinName}
+            </small>
+          )}
         </div>
       )}
-      <p className="viewer-interaction-hint">{t("atlas.rotateHint")}</p>
-      <p className="viewer-model-notice">{modelNotice}</p>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 10,
+          left: 12,
+          right: 12,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          pointerEvents: "none",
+          gap: 8,
+        }}
+      >
+        <p className="viewer-interaction-hint" style={{ position: "static", transform: "none", margin: 0 }}>
+          {t("atlas.rotateHint")}
+        </p>
+        <span
+          style={{
+            fontSize: "0.58rem",
+            color: "var(--subtle)",
+            background: "rgba(255,255,255,0.06)",
+            padding: "3px 7px",
+            borderRadius: 999,
+            border: "1px solid rgba(255,255,255,0.06)",
+            backdropFilter: "blur(8px)",
+          }}
+        >
+          {qualityLabel[quality] ?? quality} · {structures.filter((s) => s.systemId === selectedSystemId).length} structures
+        </span>
+      </div>
+      <p className="viewer-model-notice" title={modelNotice}>
+        {modelNotice}
+      </p>
     </div>
   );
 }

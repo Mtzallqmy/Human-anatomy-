@@ -150,8 +150,39 @@ export function HomePage() {
             <div className="explorer-orbit explorer-orbit--outer" />
             <div className="explorer-orbit explorer-orbit--inner" />
             <div className="explorer-core">
+              <span
+                style={{
+                  position: "absolute",
+                  top: 12,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: "0.54rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#8fd3dc",
+                  background: "rgba(143,211,220,0.12)",
+                  border: "1px solid rgba(143,211,220,0.22)",
+                  padding: "4px 8px",
+                  borderRadius: 999,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "#8fd3dc",
+                    boxShadow: "0 0 10px rgba(143,211,220,0.7)",
+                  }}
+                />
+                LIVE 3D
+              </span>
               <ScanLine size={104} strokeWidth={0.75} aria-hidden="true" />
               <span>{label("Whole-body anatomy", "تشريح الجسم الكامل")}</span>
+              <small style={{ color: "var(--subtle)", fontSize: "0.58rem", marginTop: 2 }}>
+                {label("Rotate · Isolate · Explore", "دوّر · اعزل · استكشف")}
+              </small>
             </div>
             <Link href="/atlas/male-body" className="explorer-node explorer-node--one">
               <ScanLine size={16} />
@@ -209,8 +240,11 @@ export function HomePage() {
                     <p>{localize(system.description)}</p>
                   </div>
                   <div className="system-showcase-meta">
-                    <span>{profile?.anatomyFocus.length ?? 0} {label("anatomy tracks", "محاور تشريح")}</span>
-                    <span>{profile?.physiologyFocus.length ?? 0} {label("physiology tracks", "محاور فسيولوجيا")}</span>
+                    <span>◈ {profile?.anatomyFocus.length ?? 0} {label("anatomy tracks", "محاور تشريح")}</span>
+                    <span>⬢ {profile?.physiologyFocus.length ?? 0} {label("physiology tracks", "محاور فسيولوجيا")}</span>
+                    <span style={{ background: "var(--accent-soft)", color: "var(--accent)", borderColor: "rgba(206,119,112,0.22)" }}>
+                      3D • HD
+                    </span>
                   </div>
                   <div className="system-showcase-actions">
                     <Link href={`/systems/${system.slug}`}>

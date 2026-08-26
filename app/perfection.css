@@ -1,0 +1,320 @@
+/* Perfection — premium medical atlas polish: layout, browsing, 3D clarity */
+
+:root {
+  --perfection-glow: rgba(121, 183, 199, 0.16);
+  --perfection-accent-glow: rgba(206, 119, 112, 0.14);
+  --perfection-radius: 14px;
+  --perfection-radius-lg: 20px;
+}
+
+/* Smooth scrolling and font rendering */
+html { scrollbar-gutter: stable; }
+* { scrollbar-width: thin; scrollbar-color: #2e3e4c transparent; }
+
+/* Header — premium glass, sticky */
+.app-header {
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(18px) saturate(1.15);
+  background: color-mix(in srgb, var(--surface-glass) 88%, transparent);
+  box-shadow: 0 1px 0 var(--border), 0 8px 32px rgba(0,0,0,0.18);
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+.app-header--atlas { backdrop-filter: blur(20px) saturate(1.2); }
+.brand-mark { transition: transform 160ms ease, opacity 160ms ease; }
+.brand-mark:hover { transform: translateY(-1px); }
+.brand-icon {
+  box-shadow: 0 4px 18px var(--perfection-accent-glow), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.brand-mark:hover .brand-icon { transform: scale(1.04); box-shadow: 0 6px 22px var(--perfection-accent-glow); }
+.main-navigation { gap: 28px; }
+.nav-link {
+  position: relative;
+  padding: 6px 2px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -8px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 180ms cubic-bezier(.4,0,.2,1);
+  border-radius: 2px;
+}
+.nav-link--active::after, .nav-link:hover::after { transform: scaleX(1); }
+.nav-link--active { color: var(--foreground); }
+.header-atlas-link {
+  background: var(--accent);
+  color: #0d0f10;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-weight: 650;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 16px rgba(206,119,112,0.28);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.header-atlas-link:hover { transform: translateY(-1px); background: #e08d86; box-shadow: 0 8px 22px rgba(206,119,112,0.36); }
+
+/* Hero — cinematic depth */
+.experience-hero {
+  padding-bottom: clamp(80px, 9vw, 130px);
+}
+.experience-hero .hero-title {
+  text-wrap: balance;
+  line-height: 0.92;
+  letter-spacing: -0.09em;
+  text-shadow: 0 2px 32px rgba(0,0,0,0.22);
+}
+.hero-intro {
+  font-size: 15px;
+  line-height: 1.95;
+  max-width: 62ch;
+}
+.experience-hero-actions .primary-link {
+  background: #f0ece2;
+  color: #1a1816;
+  border-radius: 999px;
+  padding: 0 18px;
+  min-height: 46px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.experience-hero-actions .primary-link:hover { transform: translateY(-2px); background: #fff; box-shadow: 0 10px 28px rgba(0,0,0,0.22); }
+.experience-hero-actions .secondary-link {
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 0 16px;
+  min-height: 42px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(8px);
+}
+.experience-hero-actions .secondary-link:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.18); }
+.experience-stat-row {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+}
+.experience-stat-row > div { transition: background 160ms ease; }
+.experience-stat-row > div:hover { background: rgba(255,255,255,0.04); }
+.experience-stat-row strong { font-variant-numeric: tabular-nums; }
+
+/* Explorer orbits — subtle float */
+.explorer-orbit { animation: orbit-rotate 42s linear infinite; }
+.explorer-orbit--inner { animation-duration: 28s; animation-direction: reverse; }
+@keyframes orbit-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.explorer-core {
+  box-shadow: inset 0 0 48px rgba(111,176,189,0.08), 0 24px 64px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.04);
+  animation: core-float 6s ease-in-out infinite;
+}
+@keyframes core-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.explorer-node {
+  backdrop-filter: blur(12px);
+  font-weight: 550;
+}
+.explorer-node:hover { box-shadow: 0 14px 36px rgba(0,0,0,0.28); }
+
+/* Systems showcase — premium cards */
+.systems-showcase-heading h2 { text-wrap: balance; }
+.system-showcase-card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--system-accent) 8%, transparent), rgba(255,255,255,0.01) 55%);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 28px rgba(0,0,0,0.14);
+  transition: transform 220ms cubic-bezier(.4,0,.2,1), box-shadow 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+.system-showcase-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.22), 0 0 0 1px color-mix(in srgb, var(--system-accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--system-accent) 22%, var(--border));
+}
+.system-showcase-top span { font-variant-numeric: tabular-nums; }
+.system-showcase-actions a { border-radius: 999px; font-weight: 600; }
+.system-showcase-actions a:first-child {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--border);
+}
+.system-showcase-actions a:first-child:hover { background: color-mix(in srgb, var(--system-accent) 12%, rgba(255,255,255,0.06)); }
+.system-showcase-actions a:last-child {
+  width: 38px; padding: 0;
+  background: var(--system-accent);
+  color: #0e0e0e;
+  border-color: transparent;
+  font-weight: 800;
+}
+
+/* Learning flow — premium steps */
+.learning-flow-grid article {
+  border-radius: 14px;
+  transition: background 180ms ease, transform 180ms ease, border-color 180ms ease;
+}
+.learning-flow-grid article:hover { background: rgba(255,255,255,0.03); transform: translateY(-2px); border-color: var(--border-strong); }
+
+/* Atlas layout — cinematic viewer */
+.atlas-layout { gap: 0; }
+.viewer-region {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 38%, rgba(110,160,180,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 120% 90% at 50% 50%, #16202a 0%, #0d141a 62%, #080d10 100%);
+  isolation: isolate;
+}
+.viewer-region::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,0.28) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.atlas-canvas-wrap::before {
+  opacity: 0.5;
+  filter: blur(0.5px);
+}
+.viewer-context-strip {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.24), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.viewer-toolbar {
+  border-radius: 14px;
+  padding: 4px 6px;
+  gap: 3px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.08);
+}
+.toolbar-button { border-radius: 8px; transition: all 140ms ease; }
+.toolbar-button--active { box-shadow: 0 2px 10px var(--perfection-accent-glow); }
+.viewer-loading {
+  backdrop-filter: blur(14px);
+  background: rgba(8,12,16,0.78);
+}
+.viewer-loading > p { letter-spacing: 0.02em; }
+.loading-spinner { filter: drop-shadow(0 2px 8px rgba(121,183,199,0.3)); }
+.viewer-selection-badge {
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.06);
+  animation: badge-in 420ms cubic-bezier(.4,0,.2,1);
+}
+@keyframes badge-in { from { opacity:0; transform: translateY(8px) scale(0.98); } to { opacity:1; transform: translateY(0) scale(1); } }
+
+/* Sidebar — premium hierarchy */
+.system-sidebar {
+  background: linear-gradient(180deg, #111820 0%, #0f171e 100%);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+}
+.search-input-wrap {
+  border-radius: 10px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  background: rgba(255,255,255,0.04);
+}
+.search-input-wrap:focus-within {
+  border-color: rgba(121,183,199,0.42);
+  box-shadow: 0 0 0 3px rgba(121,183,199,0.12);
+  background: rgba(255,255,255,0.06);
+}
+.search-results {
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.38), 0 0 0 1px rgba(255,255,255,0.06);
+  animation: search-in 180ms ease;
+}
+@keyframes search-in { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+.search-result { border-radius: 8px; transition: background 120ms ease, transform 120ms ease; }
+.search-result:hover { transform: translateX(2px); }
+.system-item {
+  border-radius: 8px;
+  transition: all 140ms ease;
+  position: relative;
+  overflow: hidden;
+}
+.system-item::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 160ms ease;
+}
+.system-item--active::before { transform: scaleY(1); }
+.system-item:hover { background: rgba(255,255,255,0.04); }
+.system-item--active { background: rgba(224,137,128,0.12); }
+.structure-tree-node { animation: tree-in 220ms ease both; }
+@keyframes tree-in { from { opacity:0; transform: translateX(-4px); } to { opacity:1; transform: translateX(0); } }
+.structure-item { transition: all 130ms ease; border-radius: 6px; }
+.structure-item:hover { background: rgba(119,171,216,0.08); transform: translateX(2px); }
+[dir="rtl"] .structure-item:hover { transform: translateX(-2px); }
+.tree-expand { border-radius: 6px; transition: background 120ms ease; }
+.tree-expand:hover { background: rgba(255,255,255,0.06); }
+.layer-manager {
+  border-radius: 12px;
+  background: rgba(118,172,184,0.06);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Structure panel — premium typography */
+.structure-panel {
+  background: linear-gradient(180deg, #111820 0%, #0e151c 100%);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.16);
+}
+.structure-title h2 {
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+.medical-tabs { gap: 0; }
+.medical-tab {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 140ms ease, background 140ms ease;
+}
+.medical-tab:hover { background: rgba(255,255,255,0.03); }
+.medical-tab--active { background: rgba(255,255,255,0.04); }
+.medical-tab--active::after { height: 2.5px; border-radius: 2px; }
+.content-section h3 { letter-spacing: -0.01em; }
+.anatomy-label {
+  border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  font-weight: 600;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.anatomy-label:hover { transform: scale(1.04); box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
+
+/* Scrollbar polish */
+.structure-list::-webkit-scrollbar, .medical-tab-content::-webkit-scrollbar { width: 4px; }
+.structure-list::-webkit-scrollbar-thumb, .medical-tab-content::-webkit-scrollbar-thumb { background: #2a3a48; border-radius: 4px; }
+.structure-list::-webkit-scrollbar-thumb:hover, .medical-tab-content::-webkit-scrollbar-thumb:hover { background: #3a4e60; }
+
+/* Empty/browsing states — more inviting */
+.sidebar-footer {
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  margin: 12px 0;
+}
+
+/* Imaging / editorial polish */
+.systems-showcase { padding-bottom: clamp(64px, 7vw, 96px); }
+.editorial-hero h1 { text-wrap: balance; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .explorer-orbit, .explorer-core, .system-showcase-card, .structure-tree-node, .search-results, .viewer-selection-badge { animation: none; transition: none; }
+}
+
+/* Responsive perfection */
+@media (max-width: 720px) {
+  .app-header { padding-inline: 16px; height: 64px; }
+  .atlas-layout { grid-template-columns: 1fr; }
+  .system-sidebar { position: fixed; inset: 0 28% 0 0; z-index: 40; transform: translateX(-100%); transition: transform 260ms cubic-bezier(.4,0,.2,1); }
+  [dir="rtl"] .system-sidebar { inset: 0 28% 0 0; transform: translateX(100%); }
+  .system-sidebar--open { transform: translateX(0); }
+  .viewer-context-strip { width: calc(100% - 16px); }
+}

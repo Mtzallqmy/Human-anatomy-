@@ -8,7 +8,7 @@ function ellipsoid(
   tissue: TissueKind,
   group: THREE.Group,
 ) {
-  const geometry = new THREE.SphereGeometry(1, 48, 36);
+  const geometry = new THREE.SphereGeometry(1, 64, 48);
   const mesh = new THREE.Mesh(geometry, createTissueMaterial(tissue));
   mesh.name = name;
   mesh.position.set(...position);
@@ -31,21 +31,64 @@ function vessel(
     false,
     "centripetal",
   );
-  const geometry = new THREE.TubeGeometry(curve, 62, radius, 16, false);
+  const geometry = new THREE.TubeGeometry(curve, 84, radius, 18, false);
   const mesh = new THREE.Mesh(geometry, createTissueMaterial(tissue));
   mesh.name = name;
   mesh.castShadow = true;
+  mesh.receiveShadow = true;
   group.add(mesh);
   return mesh;
 }
 
 function valve(name: string, position: [number, number, number], radius: number, group: THREE.Group) {
-  const mesh = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.065, 12, 38), createTissueMaterial("valve"));
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.055, 14, 42), createTissueMaterial("valve"));
+  torus.name = name;
+  torus.position.set(...position);
+  torus.rotation.x = 0.44;
+  group.add(torus);
+  // valve leaflets — three thin curved leaflets
+  for (let i = 0; i < 3; i++) {
+    const leaf = new THREE.Mesh(
+      new THREE.CircleGeometry(radius * 0.72, 18, 0, Math.PI * 0.62),
+      createTissueMaterial("valve"),
+    );
+    leaf.name = `${name}_Leaflet_${i + 1}`;
+    leaf.position.set(position[0], position[1] - 0.04, position[2]);
+    leaf.rotation.z = (i * Math.PI * 2) / 3;
+    leaf.rotation.x = 0.55;
+    leaf.castShadow = true;
+    group.add(leaf);
+  }
+  return torus;
+}
+
+function papillaryMuscle(
+  name: string,
+  position: [number, number, number],
+  height: number,
+  group: THREE.Group,
+) {
+  const mesh = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.075, height, 8, 16),
+    createTissueMaterial("myocardium"),
+  );
   mesh.name = name;
   mesh.position.set(...position);
-  mesh.rotation.x = 0.44;
+  mesh.castShadow = true;
   group.add(mesh);
   return mesh;
+}
+
+function chordae(
+  from: [number, number, number],
+  to: [number, number, number],
+  group: THREE.Group,
+) {
+  const curve = new THREE.LineCurve3(new THREE.Vector3(...from), new THREE.Vector3(...to));
+  const geo = new THREE.TubeGeometry(curve, 6, 0.012, 6, false);
+  const mesh = new THREE.Mesh(geo, createTissueMaterial("valve"));
+  mesh.castShadow = false;
+  group.add(mesh);
 }
 
 export function createProceduralHeart(): THREE.Group {
@@ -70,8 +113,14 @@ export function createProceduralHeart(): THREE.Group {
   );
   rightVentricle.rotation.z = 0.24;
 
-  ellipsoid("Heart_RightAtrium", [0.84, 0.62, 0.02], [0.65, 0.54, 0.62], "right-chamber", group);
-  ellipsoid("Heart_LeftAtrium", [-0.5, 0.67, -0.12], [0.62, 0.49, 0.55], "left-chamber", group);
+  // Atrial appendages — more anatomical detail
+  const rightAtrium = ellipsoid("Heart_RightAtrium", [0.84, 0.62, 0.02], [0.65, 0.54, 0.62], "right-chamber", group);
+  const leftAtrium = ellipsoid("Heart_LeftAtrium", [-0.5, 0.67, -0.12], [0.62, 0.49, 0.55], "left-chamber", group);
+  // Appendage bulges
+  ellipsoid("Heart_RightAtrialAppendage", [0.98, 0.38, 0.32], [0.28, 0.32, 0.26], "right-chamber", group);
+  ellipsoid("Heart_LeftAtrialAppendage", [-0.72, 0.44, 0.28], [0.26, 0.3, 0.24], "left-chamber", group);
+  // Apex notch detail
+  ellipsoid("Heart_Apex", [-0.18, -1.42, 0.08], [0.22, 0.18, 0.2], "myocardium", group);
 
   const septum = ellipsoid(
     "Heart_InterventricularSeptum",
@@ -81,6 +130,9 @@ export function createProceduralHeart(): THREE.Group {
     group,
   );
   septum.rotation.z = -0.12;
+
+  // Interatrial septum hint
+  ellipsoid("Heart_InteratrialSeptum", [0.14, 0.58, 0.18], [0.08, 0.38, 0.12], "septum", group);
 
   vessel(
     "Heart_Aorta",
@@ -139,6 +191,14 @@ export function createProceduralHeart(): THREE.Group {
   valve("Heart_PulmonaryValve", [0.16, 0.71, 0.76], 0.13, group);
   valve("Heart_AorticValve", [-0.22, 0.73, 0.44], 0.12, group);
 
+  // Papillary muscles + chordae tendineae — visible interior detail
+  papillaryMuscle("Heart_AnterolateralPapillary", [-0.32, -0.82, 0.42], 0.38, group);
+  papillaryMuscle("Heart_PosteromedialPapillary", [-0.18, -0.92, 0.28], 0.34, group);
+  papillaryMuscle("Heart_RightPapillary", [0.52, -0.68, 0.48], 0.3, group);
+  chordae([-0.32, -0.64, 0.42], [-0.45, 0.12, 0.7], group);
+  chordae([-0.18, -0.74, 0.28], [-0.45, 0.12, 0.7], group);
+  chordae([0.52, -0.52, 0.48], [0.61, 0.11, 0.71], group);
+
   vessel(
     "Heart_CoronaryArteries",
     [
@@ -175,6 +235,20 @@ export function createProceduralHeart(): THREE.Group {
     "coronary",
     group,
   );
+
+  // Myocardial surface striations — subtle torus rings for realism
+  for (let i = 0; i < 3; i++) {
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(0.58 - i * 0.08, 0.018, 8, 44, Math.PI * 1.35),
+      createTissueMaterial("myocardium"),
+    );
+    ring.position.set(-0.28, -0.55 - i * 0.18, 0.62);
+    ring.rotation.x = 0.9;
+    ring.rotation.z = -0.18;
+    ring.material.transparent = true;
+    ring.material.opacity = 0.42;
+    group.add(ring);
+  }
 
   group.position.y = -0.2;
   return group;
