@@ -4,6 +4,7 @@ import { ArrowUpRight, BookOpen, GitBranch, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { BilingualMedicalText } from "@/src/components/medical/BilingualMedicalText";
 import { getSystemLearningProfile } from "@/src/data/anatomy/comprehensiveSystems";
+import { getSexSpecificLearningProfile } from "@/src/data/anatomy/sexSpecificLearningProfiles";
 import { useLocale } from "@/src/hooks/useLocale";
 import { medicalRepository } from "@/src/services/medicalRepository";
 import { useViewerStore } from "@/src/store/viewerStore";
@@ -15,7 +16,7 @@ export function AnatomyPanel({ structure }: { structure: AnatomicalStructure }) 
   const setSelectedSystem = useViewerStore((state) => state.setSelectedSystem);
   const router = useRouter();
   const label = (en: string, ar: string) => (locale === "ar" ? ar : en);
-  const profile = getSystemLearningProfile(structure.systemId);
+  const profile = getSystemLearningProfile(structure.systemId) ?? getSexSpecificLearningProfile(structure.systemId);
   const openStructure = (item: AnatomicalStructure) => {
     setSelectedSystem(item.systemId, item.id);
     setSelectedStructure(item.id);
