@@ -151,10 +151,7 @@ body {
   margin: 0 auto;
   padding: clamp(42px, 7vw, 86px) 0 80px;
 }
-.reproductive-choice-main > header {
-  max-width: 850px;
-  margin-bottom: 34px;
-}
+.reproductive-choice-main > header { max-width: 850px; margin-bottom: 34px; }
 .reproductive-choice-main > header > p:first-child {
   color: var(--blue);
   text-transform: uppercase;
@@ -252,6 +249,66 @@ html[data-theme="comfort"] .structure-item--active { color: var(--foreground); }
 html[data-theme="light"] .medical-content .content-section,
 html[data-theme="comfort"] .medical-content .content-section {
   background: var(--surface-raised);
+  border-color: var(--border);
+}
+
+html[data-theme="light"] .imaging-page,
+html[data-theme="comfort"] .imaging-page,
+html[data-theme="light"] .editorial-page,
+html[data-theme="comfort"] .editorial-page,
+html[data-theme="light"] .marketing-page,
+html[data-theme="comfort"] .marketing-page {
+  background: var(--background);
+  color: var(--foreground);
+}
+html[data-theme="light"] .imaging-page-header,
+html[data-theme="comfort"] .imaging-page-header,
+html[data-theme="light"] .imaging-study-sidebar,
+html[data-theme="comfort"] .imaging-study-sidebar,
+html[data-theme="light"] .imaging-info-panel,
+html[data-theme="comfort"] .imaging-info-panel {
+  background: var(--surface);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+html[data-theme="light"] .imaging-page-header,
+html[data-theme="comfort"] .imaging-page-header {
+  background-image: linear-gradient(120deg, var(--blue-soft), transparent 48%);
+}
+html[data-theme="light"] .imaging-study-sidebar > button,
+html[data-theme="comfort"] .imaging-study-sidebar > button,
+html[data-theme="light"] .imaging-page-header a,
+html[data-theme="comfort"] .imaging-page-header a,
+html[data-theme="light"] .imaging-info-panel p,
+html[data-theme="comfort"] .imaging-info-panel p {
+  color: var(--muted);
+}
+html[data-theme="light"] .imaging-study-sidebar > button.is-active,
+html[data-theme="comfort"] .imaging-study-sidebar > button.is-active {
+  background: var(--blue-soft);
+  color: var(--foreground);
+  border-color: var(--border-strong);
+}
+html[data-theme="light"] .imaging-provenance,
+html[data-theme="comfort"] .imaging-provenance,
+html[data-theme="light"] .imaging-linked-list a,
+html[data-theme="comfort"] .imaging-linked-list a,
+html[data-theme="light"] .imaging-reference,
+html[data-theme="comfort"] .imaging-reference {
+  background: var(--surface-raised);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+html[data-theme="light"] .system-showcase-card,
+html[data-theme="comfort"] .system-showcase-card,
+html[data-theme="light"] .anatomy-learning-card,
+html[data-theme="comfort"] .anatomy-learning-card,
+html[data-theme="light"] .mechanism-card,
+html[data-theme="comfort"] .mechanism-card,
+html[data-theme="light"] .physiology-values-panel,
+html[data-theme="comfort"] .physiology-values-panel {
+  background: var(--surface);
+  color: var(--foreground);
   border-color: var(--border);
 }
 
