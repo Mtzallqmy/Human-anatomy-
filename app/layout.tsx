@@ -3,6 +3,7 @@ import { AppProviders } from "@/src/app/providers/AppProviders";
 import "./globals.css";
 import "./experience.css";
 import "./panel-enhancements.css";
+import "./theme-enhancements.css";
 
 const productionHost =
   process.env.VERCEL_PROJECT_PRODUCTION_URL ?? "human-anatomy-medical-atlas.vercel.app";
@@ -23,21 +24,15 @@ export const metadata: Metadata = {
     "physiology",
     "pathology",
     "interactive 3D",
-    "cardiovascular",
-    "heart anatomy",
+    "male anatomy",
+    "female anatomy",
+    "reproductive anatomy",
   ],
   openGraph: {
     title: "Human Anatomy, Physiology & Pathology Atlas",
     description: "A bilingual interactive medical atlas connecting anatomy, physiology, and pathology.",
     type: "website",
-    images: [
-      {
-        url: "/og.png",
-        width: 1200,
-        height: 630,
-        alt: "Human Anatomy, Physiology & Pathology Atlas",
-      },
-    ],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Human Anatomy, Physiology & Pathology Atlas" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -45,19 +40,12 @@ export const metadata: Metadata = {
     description: "A bilingual interactive medical atlas connecting anatomy, physiology, and pathology.",
     images: ["/og.png"],
   },
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-  },
+  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html lang="en" dir="ltr" data-theme="comfort" suppressHydrationWarning>
       <body>
         <AppProviders>{children}</AppProviders>
       </body>

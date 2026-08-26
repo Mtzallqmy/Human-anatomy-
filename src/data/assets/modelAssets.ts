@@ -1,8 +1,9 @@
 import { allHumanStructures } from "@/src/data/anatomy/humanBodyCatalog";
 import { supplementalStructures } from "@/src/data/anatomy/comprehensiveSystems";
+import { sexSpecificStructures } from "@/src/data/anatomy/sexSpecificAtlas";
 import type { ModelAsset } from "@/src/types/medical";
 
-const catalogStructures = [...allHumanStructures, ...supplementalStructures];
+const catalogStructures = [...allHumanStructures, ...supplementalStructures, ...sexSpecificStructures];
 const VANATOME_MODEL_BASE = "https://atlas.vanatome.vixotic.in/models";
 
 const licensedAttribution = {
@@ -20,11 +21,14 @@ type AssetDefinition = {
   systemId: string;
   rootStructureId: string;
   bundle?: string;
+  fileName?: string;
   lod?: ModelAsset["lod"];
 };
 
 const definitions: AssetDefinition[] = [
   { id: "MODEL_PROCEDURAL_FULL_BODY", systemId: "SYS_FULL_BODY", rootStructureId: "ANAT_HUMAN_BODY", lod: "simplified" },
+  { id: "MODEL_ZANATOMY_MALE_FULL_BODY", systemId: "SYS_MALE_BODY", rootStructureId: "ANAT_MALE_BODY", bundle: "full-body", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_FEMALE_FULL_BODY", systemId: "SYS_FEMALE_BODY", rootStructureId: "ANAT_FEMALE_BODY", bundle: "full-body", lod: "detailed" },
   { id: "MODEL_ZANATOMY_CARDIOVASCULAR", systemId: "SYS_CARDIOVASCULAR", rootStructureId: "ANAT_HEART", bundle: "cardiovascular", lod: "detailed" },
   { id: "MODEL_ZANATOMY_RESPIRATORY", systemId: "SYS_RESPIRATORY", rootStructureId: "ANAT_RESPIRATORY", bundle: "respiratory", lod: "detailed" },
   { id: "MODEL_ZANATOMY_DIGESTIVE", systemId: "SYS_DIGESTIVE", rootStructureId: "ANAT_DIGESTIVE", bundle: "digestive", lod: "detailed" },
@@ -36,16 +40,20 @@ const definitions: AssetDefinition[] = [
   { id: "MODEL_ZANATOMY_ENDOCRINE", systemId: "SYS_ENDOCRINE", rootStructureId: "ANAT_ENDOCRINE", bundle: "endocrine", lod: "detailed" },
   { id: "MODEL_ZANATOMY_LYMPHATIC", systemId: "SYS_LYMPHATIC", rootStructureId: "ANAT_LYMPHATIC", bundle: "lymphatic", lod: "detailed" },
   { id: "MODEL_ZANATOMY_REPRODUCTIVE", systemId: "SYS_REPRODUCTIVE", rootStructureId: "ANAT_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_MALE_REPRODUCTIVE", systemId: "SYS_MALE_REPRODUCTIVE", rootStructureId: "ANAT_MALE_REPRODUCTIVE", fileName: "z-anatomy-male-reproductive.glb", lod: "detailed" },
+  { id: "MODEL_ZANATOMY_FEMALE_REPRODUCTIVE", systemId: "SYS_FEMALE_REPRODUCTIVE", rootStructureId: "ANAT_FEMALE_REPRODUCTIVE", bundle: "reproductive", lod: "detailed" },
   { id: "MODEL_PROCEDURAL_INTEGUMENTARY", systemId: "SYS_INTEGUMENTARY", rootStructureId: "ANAT_INTEGUMENTARY" },
 ];
 
 export const modelAssets: ModelAsset[] = definitions.map((definition) => {
-  const isLicensed = Boolean(definition.bundle);
+  const isLicensed = Boolean(definition.bundle || definition.fileName);
   return {
     id: definition.id,
-    url: definition.bundle
-      ? `${VANATOME_MODEL_BASE}/z-anatomy-1.4.0-${definition.bundle}.glb`
-      : null,
+    url: definition.fileName
+      ? `${VANATOME_MODEL_BASE}/${definition.fileName}`
+      : definition.bundle
+        ? `${VANATOME_MODEL_BASE}/z-anatomy-1.4.0-${definition.bundle}.glb`
+        : null,
     systemId: definition.systemId,
     rootStructureId: definition.rootStructureId,
     structureIds: catalogStructures

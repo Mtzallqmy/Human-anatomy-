@@ -7,21 +7,36 @@ import {
   supplementalPhysiologyAnimations,
   supplementalStructures,
 } from "@/src/data/anatomy/comprehensiveSystems";
+import {
+  sexSpecificPhysiologyAnimations,
+  sexSpecificStructures,
+  sexSpecificSystems,
+} from "@/src/data/anatomy/sexSpecificAtlas";
 import { modelAssets } from "@/src/data/assets/modelAssets";
 import { comprehensiveDiseases } from "@/src/data/pathology/comprehensiveDiseases";
 import { heartDiseases } from "@/src/data/pathology/heartDiseases";
+import { wholeBodyPhysiologyAnimations } from "@/src/data/physiology/wholeBodyProcesses";
 import { scientificReferences } from "@/src/data/references/references";
 import { bodySystems } from "@/src/data/systems/systems";
 import type { SearchResult } from "@/src/types/medical";
 
-const structuresCatalog = [...allHumanStructures, ...supplementalStructures];
+const systemsCatalog = [
+  ...bodySystems.filter((system) => system.id !== "SYS_REPRODUCTIVE"),
+  ...sexSpecificSystems,
+];
+const structuresCatalog = [...allHumanStructures, ...supplementalStructures, ...sexSpecificStructures];
 const diseasesCatalog = [...heartDiseases, ...expandedDiseases, ...comprehensiveDiseases];
-const physiologyCatalog = [...physiologyAnimations, ...supplementalPhysiologyAnimations];
+const physiologyCatalog = [
+  ...physiologyAnimations,
+  ...supplementalPhysiologyAnimations,
+  ...sexSpecificPhysiologyAnimations,
+  ...wholeBodyPhysiologyAnimations,
+];
 
 export const medicalRepository = {
-  getSystems: () => bodySystems,
-  getSystemById: (id: string) => bodySystems.find((system) => system.id === id),
-  getSystemBySlug: (slug: string) => bodySystems.find((system) => system.slug === slug),
+  getSystems: () => systemsCatalog,
+  getSystemById: (id: string) => systemsCatalog.find((system) => system.id === id),
+  getSystemBySlug: (slug: string) => systemsCatalog.find((system) => system.slug === slug),
   getStructures: () => structuresCatalog,
   getStructureById: (id: string) => structuresCatalog.find((structure) => structure.id === id),
   getSystemStructures: (systemId: string) =>
@@ -54,7 +69,7 @@ export const medicalRepository = {
         systemId: item.systemId,
         href: `/atlas/structure/${item.id}`,
       }));
-    const systems: SearchResult[] = bodySystems
+    const systems: SearchResult[] = systemsCatalog
       .filter((item) => item.available && matches(item.name.en, item.name.ar))
       .map((item) => ({
         id: item.id,
@@ -73,7 +88,7 @@ export const medicalRepository = {
         name: item.name,
         type: "physiology",
         systemId: item.systemId,
-        href: `/atlas/${bodySystems.find((system) => system.id === item.systemId)?.slug ?? "human-body"}`,
+        href: `/atlas/${systemsCatalog.find((system) => system.id === item.systemId)?.slug ?? "human-body"}`,
       }));
     return [...structures, ...systems, ...physiology, ...diseases].slice(0, 12);
   },
